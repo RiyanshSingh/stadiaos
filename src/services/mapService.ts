@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import type { Zone, Amenity } from '@/lib/types/domain';
+import type { Zone, Amenity, Incident } from '@/lib/types/domain';
 import { alertService } from './alertService';
 import { buildVenueGraph } from './routing/venueGraph';
 import type { RouteGraph } from '@/lib/types/routing';
@@ -17,94 +17,99 @@ export type MapPoint = {
   status?: 'active' | 'resolved';
 };
 
+type AmenityRow = Amenity & {
+  zone?: Zone | null;
+};
+
+type IncidentWithZone = Incident & {
+  zone?: { metadata?: { x?: string; y?: string } } | null;
+};
+
+type RouteNodeZone = Zone & {
+  metadata?: any;
+};
+
+type AmenityRouteRow = Amenity & {
+  zone?: { metadata?: { routing_key?: string } } | null;
+};
+
+type RouteRow = {
+  distance: number;
+  is_accessible: boolean;
+  from_zone?: { metadata?: { routing_key?: string } } | null;
+  to_zone?: { metadata?: { routing_key?: string } } | null;
+};
+
 export const mapService = {
   fetchExplorePoints: async (_stadiumId: string, _matchId: string): Promise<MapPoint[]> => {
     const TEMPLATE_STADIUM_ID = '11111111-1111-1111-1111-111111111111';
 
-    // 1. Fetch amenities
     const { data: amenities } = await supabase
-      .from('amenities')
+      .from<AmenityRow>('amenities')
       .select('*, zone:zones(*)')
       .eq('stadium_id', TEMPLATE_STADIUM_ID);
 
-    // 2. Fetch zones
     const { data: zones } = await supabase
-      .from('zones')
+      .from<Zone>('zones')
       .select('*')
       .eq('stadium_id', TEMPLATE_STADIUM_ID);
 
     const points: MapPoint[] = [];
 
-    // Map amenities (food, washroom, medical)
-    if (amenities) {
-      for (const am of amenities as Amenity[]) {
-        if (am.metadata?.x && am.metadata?.y) {
-          points.push({
-            id: am.id,
-            x: am.metadata.x,
-            y: am.metadata.y,
-            type: am.amenity_type,
-            name: am.name,
-            accessible: am.is_accessible,
-            desc: `Zone: ${am.zone?.name || ''}`
-          });
-        }
-      }
+    for (const amenity of amenities ?? []) {
+      if (!amenity.metadata?.x || !amenity.metadata?.y) continue;
+      points.push({
+        id: amenity.id,
+        x: amenity.metadata.x,
+        y: amenity.metadata.y,
+        type: amenity.amenity_type,
+        name: amenity.name,
+        accessible: amenity.is_accessible,
+        desc: `Zone: ${amenity.zone?.name ?? ''}`
+      });
     }
 
-    // Map zones (gates, exits)
-    if (zones) {
-      for (const z of zones as Zone[]) {
-        if (z.metadata?.x && z.metadata?.y && (z.zone_type === 'gate' || z.zone_type === 'exit')) {
-          points.push({
-            id: z.id,
-            x: z.metadata.x,
-            y: z.metadata.y,
-            type: z.zone_type,
-            name: z.name,
-            accessible: z.is_accessible
-          });
-        }
-      }
+    for (const zone of zones ?? []) {
+      if (!zone.metadata?.x || !zone.metadata?.y) continue;
+      if (zone.zone_type !== 'gate' && zone.zone_type !== 'exit') continue;
+
+      points.push({
+        id: zone.id,
+        x: zone.metadata.x,
+        y: zone.metadata.y,
+        type: zone.zone_type,
+        name: zone.name,
+        accessible: zone.is_accessible
+      });
     }
 
     return points;
   },
 
   fetchLiveOverlays: async (matchId: string, _stadiumId: string): Promise<MapPoint[]> => {
-    // For live mode, we fetch alerts and map them to points if they have coordinates
     const alerts = await alertService.fetchActiveAlerts(matchId);
-    
-    // We need to join incidents with zones to get coordinates.
-    // Fetch all incidents that are NOT resolved, to show on the live map.
-    // We don't filter to only high/critical here, because fans might want to see where general help is.
-    // BUT we should respect the fan-safe rule. We'll let the alertService dictate what's an "alert".
-    // For general incidents reported by fans (like a spilled drink), we can show as 'live_incident'.
+
     const { data: incidents } = await supabase
-      .from('incidents')
+      .from<IncidentWithZone>('incidents')
       .select('*, zone:zones(*)')
       .eq('match_id', matchId)
       .neq('status', 'resolved');
 
     const points: MapPoint[] = [];
 
-    if (incidents) {
-      for (const inc of incidents as any[]) {
-        if (inc.zone?.metadata?.x && inc.zone?.metadata?.y) {
-          // Check if this incident is also an active alert
-          const isAlert = alerts.some(a => a.id === inc.id);
-          
-          points.push({
-            id: inc.id,
-            x: inc.zone.metadata.x,
-            y: inc.zone.metadata.y,
-            type: isAlert ? 'live_alert' : 'live_incident',
-            name: inc.title,
-            desc: inc.ai_summary || inc.description,
-            status: 'active'
-          });
-        }
-      }
+    for (const incident of incidents ?? []) {
+      if (!incident.zone?.metadata?.x || !incident.zone?.metadata?.y) continue;
+
+      const isAlert = alerts.some((alert) => alert.id === incident.id);
+      points.push({
+        id: incident.id,
+        x: incident.zone.metadata.x,
+        y: incident.zone.metadata.y,
+        type: isAlert ? 'live_alert' : 'live_incident',
+        name: incident.title,
+        desc: incident.ai_summary ?? incident.description,
+        status: 'active'
+      });
     }
 
     return points;
@@ -114,37 +119,39 @@ export const mapService = {
     const TEMPLATE_STADIUM_ID = '11111111-1111-1111-1111-111111111111';
 
     const [{ data: zones }, { data: amenities }, { data: routes }] = await Promise.all([
-      supabase.from('zones').select('*').eq('stadium_id', TEMPLATE_STADIUM_ID),
-      supabase.from('amenities').select('*, zone:zones(metadata)').eq('stadium_id', TEMPLATE_STADIUM_ID),
-      supabase.from('routes').select('*, from_zone:zones!from_zone_id(metadata), to_zone:zones!to_zone_id(metadata)').eq('stadium_id', TEMPLATE_STADIUM_ID),
+      supabase.from<RouteNodeZone>('zones').select('*').eq('stadium_id', TEMPLATE_STADIUM_ID),
+      supabase.from<AmenityRouteRow>('amenities').select('*, zone:zones(metadata)').eq('stadium_id', TEMPLATE_STADIUM_ID),
+      supabase.from<RouteRow>('routes')
+        .select('*, from_zone:zones!from_zone_id(metadata), to_zone:zones!to_zone_id(metadata)')
+        .eq('stadium_id', TEMPLATE_STADIUM_ID)
     ]);
 
     const allNodes = [
-      ...(zones ?? []).map((z: any) => ({
-        id: z.id,
-        name: z.name,
-        level: z.level,
-        is_accessible: z.is_accessible,
-        metadata: z.metadata,
+      ...(zones ?? []).map((zone) => ({
+        id: zone.id,
+        name: zone.name,
+        level: zone.level,
+        is_accessible: zone.is_accessible,
+        metadata: zone.metadata
       })),
-      ...(amenities ?? []).map((a: any) => ({
-        id: a.id,
-        name: a.name,
+      ...(amenities ?? []).map((amenity) => ({
+        id: amenity.id,
+        name: amenity.name,
         level: '1',
-        is_accessible: a.is_accessible,
-        metadata: a.metadata,
-        parent_routing_key: a.zone?.metadata?.routing_key,
-      })),
+        is_accessible: amenity.is_accessible,
+        metadata: amenity.metadata,
+        parent_routing_key: amenity.zone?.metadata?.routing_key
+      }))
     ];
 
-    const allRoutes = (routes ?? []).map((r: any) => ({
-      fromKey: r.from_zone?.metadata?.routing_key,
-      toKey: r.to_zone?.metadata?.routing_key,
-      distanceMeters: r.distance,
-      is_accessible: r.is_accessible,
-      type: r.distance > 30 ? (r.is_accessible ? 'elevator' : 'stairs') : 'walk' // infer roughly
+    const allRoutes = (routes ?? []).map((route) => ({
+      fromKey: route.from_zone?.metadata?.routing_key,
+      toKey: route.to_zone?.metadata?.routing_key,
+      distanceMeters: route.distance,
+      is_accessible: route.is_accessible,
+      type: route.distance > 30 ? (route.is_accessible ? 'elevator' : 'stairs') : 'walk'
     }));
 
     return buildVenueGraph(allNodes, allRoutes);
-  },
+  }
 };

@@ -48,6 +48,16 @@ describe('authGuards', () => {
       
       await expect(requireFanSession()).resolves.toBe('user123');
     });
+
+    it('should throw an error if profile is missing', async () => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue({ data: { user: { id: 'user123' } }, error: null } as any);
+      const mockSingle = vi.fn().mockResolvedValue({ data: null });
+      const mockEq = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+      vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
+      
+      await expect(requireFanSession()).rejects.toThrow('Forbidden: Fan role required.');
+    });
   });
 
   describe('requireOpsSession', () => {
@@ -69,6 +79,16 @@ describe('authGuards', () => {
       vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
       
       await expect(requireOpsSession()).resolves.toBe('user123');
+    });
+
+    it('should throw an error if profile is missing', async () => {
+      vi.mocked(supabase.auth.getUser).mockResolvedValue({ data: { user: { id: 'user123' } }, error: null } as any);
+      const mockSingle = vi.fn().mockResolvedValue({ data: null });
+      const mockEq = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+      vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
+      
+      await expect(requireOpsSession()).rejects.toThrow('Forbidden: Ops manager role required.');
     });
   });
 

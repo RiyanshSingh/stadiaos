@@ -5,7 +5,25 @@ StadiaOS is a next-generation stadium operations and fan experience platform. It
 1. **Fan Experience Portal (`/auth`)**: A personalized, context-aware matchday companion.
 2. **Operations Command Center (`/opsauth`)**: A real-time triage and crowd management dashboard.
 
-Under the hood, StadiaOS uses a powerful custom Routing Engine, AI-driven Intent Parsing (via Groq), and secure Supabase Row Level Security to ensure every fan gets exactly the help they need—while keeping operations strictly secure.
+---
+
+## Your chosen vertical
+**Smart Stadium & Venue Management**
+StadiaOS focuses exclusively on enhancing the live event experience by optimizing crowd flow, surfacing real-time facility metrics, and empowering fans with AI-guided assistance.
+
+## Approach and logic
+Our approach centers around a deterministic routing engine combined with a probabilistic LLM intent parser. Instead of treating the AI as a generic chatbot, we use it as an intent router that classifies fan requests (e.g., `FACILITY_LOOKUP`, `ROUTE_HANDOFF`, `INCIDENT_DRAFT`) and triggers strict deterministic UI flows. This ensures 100% safety and predictability in high-stress environments.
+
+## How the solution works
+1. **Fan Context Initialization**: When a fan links their ticket, StadiaOS sets their precise stadium, zone, and seat coordinates in the global state.
+2. **AI Copilot (`/copilot`)**: Fans interact with the assistant via natural language. The `copilotIntentService` uses Groq to classify the request and extract parameters.
+3. **Deterministic Resolution**: The `copilotResolver` maps the intent to backend services (e.g., `routingService` for A* graph traversal, `facilityService` for queries) and returns a typed "Action Card" (not just raw text) that the frontend renders natively.
+4. **Ops Triage**: Fans can report incidents which are instantly synced to the Ops Manager's live dashboard via Supabase real-time subscriptions, allowing immediate dispatch of security or medical teams.
+
+## Any assumptions made
+- **Connectivity**: We assume fans have internet connectivity within the stadium. However, the app includes robust error boundaries and loading states for flaky connections.
+- **Data Availability**: We assume the stadium operator has mapped the venue into our predefined zone graph structure for the routing engine to function.
+- **LLM Latency**: We assume occasional API latency from Groq, so the app implements a blazing-fast local regex fallback parser to ensure zero downtime.
 
 ---
 

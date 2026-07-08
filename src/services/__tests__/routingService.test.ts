@@ -37,6 +37,8 @@ const MOCK_DB_ROUTES = [
   { fromKey: 'gate_a', toKey: 'north_concourse', distanceMeters: 50, is_accessible: true, type: 'walk' },
   { fromKey: 'north_concourse', toKey: 'washroom_north', distanceMeters: 10, is_accessible: true, type: 'walk' },
   { fromKey: 'washroom_north', toKey: 'north_concourse', distanceMeters: 10, is_accessible: true, type: 'walk' },
+  { fromKey: 'north_concourse', toKey: 'food_north', distanceMeters: 12, is_accessible: true, type: 'walk' },
+  { fromKey: 'food_north', toKey: 'north_concourse', distanceMeters: 12, is_accessible: true, type: 'walk' },
   { fromKey: 'gate_a', toKey: 'section_330', distanceMeters: 30, is_accessible: false, type: 'stairs' },
   { fromKey: 'section_330', toKey: 'gate_a', distanceMeters: 30, is_accessible: false, type: 'stairs' },
 ];
@@ -102,6 +104,42 @@ describe('routingService', () => {
     expect(result.ok).toBe(true);
   });
 
+  it('computes a valid route from Section 214 to cafeteria/food in standard mode', () => {
+    const result = routingService.computeRoute(
+      {
+        source: { kind: 'ticket_seat' },
+        destination: { kind: 'label', label: 'cafeteria' },
+        mode: 'standard',
+      },
+      graph
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.destinationLabel).toBe('Burger Grill');
+    expect(result.pathNodeKeys).toEqual(['section_214', 'north_concourse', 'food_north']);
+    expect(result.steps[result.steps.length - 1].instruction).toBe('Arrive at Burger Grill');
+  });
+
+  it('computes a route from Gate A to food as an additional non-seat path', () => {
+    const result = routingService.computeRoute(
+      {
+        source: { kind: 'zone', routingKey: ROUTING_KEYS.GATE_A },
+        destination: { kind: 'label', label: 'food' },
+        mode: 'standard',
+      },
+      graph
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.sourceLabel).toBe('Gate A');
+    expect(result.destinationLabel).toBe('Burger Grill');
+    expect(result.pathNodeKeys).toEqual(['gate_a', 'north_concourse', 'food_north']);
+  });
+
   it('returns an error if no accessible route exists to a stair-only destination', () => {
     // Section 330 is only reachable via stairs (accessible: false edge)
     const result = routingService.computeRoute(
@@ -148,6 +186,11 @@ describe('nodeResolver', () => {
   it('resolves label "washroom" to washroom_north', () => {
     const key = resolveDestinationKey({ kind: 'label', label: 'washroom' }, null, graph);
     expect(key).toBe(ROUTING_KEYS.WASHROOM_NORTH);
+  });
+
+  it('resolves label "cafeteria" to food_north', () => {
+    const key = resolveDestinationKey({ kind: 'label', label: 'cafeteria' }, null, graph);
+    expect(key).toBe(ROUTING_KEYS.FOOD_NORTH);
   });
 
   it('resolves gate strategy to gate routing key', () => {

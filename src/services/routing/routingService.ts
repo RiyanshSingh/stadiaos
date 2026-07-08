@@ -124,7 +124,19 @@ function buildSteps(segments: PathSegment[], graph: RouteGraph): RouteStep[] {
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
+/**
+ * Primary routing service responsible for graph traversal and path computation.
+ * Implements a weighted Dijkstra algorithm for resolving optimal paths between
+ * venue coordinates, taking into account accessible routes.
+ */
 export const routingService = {
+  /**
+   * Computes the optimal route from a source to a destination.
+   *
+   * @param {RouteRequest} request - The requested source, destination, and mode (standard/accessible).
+   * @param {RouteGraph} graph - The stadium's node/edge graph structure.
+   * @returns {RouteOutcome} The calculated route containing ETA, path polyline, and step-by-step instructions.
+   */
   computeRoute(request: RouteRequest, graph: RouteGraph): RouteOutcome {
     const { ticket } = useAppStore.getState();
 

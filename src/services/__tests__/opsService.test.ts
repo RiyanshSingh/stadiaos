@@ -3,6 +3,8 @@ import { opsService } from '../opsService';
 import { supabase } from '../supabase';
 import { dashboardService } from '../dashboardService';
 import { queueService } from '../queueService';
+import { facilityService } from '../facilityService';
+import { requireOpsSession } from '@/lib/authGuards';
 
 vi.mock('@/lib/authGuards', () => ({
   requireOpsSession: vi.fn().mockResolvedValue('ops-123'),
@@ -36,9 +38,24 @@ vi.mock('../facilityService', () => ({
 describe('opsService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(requireOpsSession).mockResolvedValue('ops-123');
   });
 
   describe('fetchCommandCenterSnapshot', () => {
+    it('rejects when ops session is missing', async () => {
+      vi.mocked(requireOpsSession).mockRejectedValueOnce(new Error('Forbidden'));
+
+      await expect(opsService.fetchCommandCenterSnapshot('match-123')).rejects.toThrow('Forbidden');
+      expect(supabase.from).not.toHaveBeenCalled();
+      expect(dashboardService.getDashboardGateStatus).not.toHaveBeenCalled();
+      expect(queueService.fetchQueueMetrics).not.toHaveBeenCalled();
+    });
+
+    it('rejects when matchId is invalid', async () => {
+      await expect(opsService.fetchCommandCenterSnapshot('')).rejects.toThrow('Invalid snapshot context.');
+      expect(supabase.from).not.toHaveBeenCalled();
+    });
+
     it('aggregates data correctly from multiple sources', async () => {
       // Mock supabase count responses
       const _mockSelect = vi.fn().mockReturnThis();
@@ -90,6 +107,14 @@ describe('opsService', () => {
   });
 
   describe('publishPublicAdvisory', () => {
+    it('rejects when ops session is missing', async () => {
+      vi.mocked(requireOpsSession).mockRejectedValueOnce(new Error('Forbidden'));
+
+      await expect(opsService.publishPublicAdvisory('match-1', 'stad-1', 'Test Alert', 'Test Content'))
+        .rejects.toThrow('Forbidden');
+      expect(supabase.from).not.toHaveBeenCalled();
+    });
+
     it('inserts a public advisory into ai_recommendations', async () => {
       const mockInsert = vi.fn().mockResolvedValue({ error: null });
       (supabase.from as any).mockReturnValue({
@@ -128,5 +153,80 @@ describe('opsService', () => {
 
     await expect(opsService.publishPublicAdvisory('match-1', 'stadium-1', 'Test Title', 'Test Content'))
       .rejects.toThrow('Insert failed');
+  });
+
+  describe('fetchCommandCenterSnapshot edge cases', () => {
+    it('handles empty state fallback when counts return null', async () => {
+      const mockFrom = vi.fn((table) => {
+        if (table === 'incidents') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            neq: vi.fn().mockReturnThis().mockReturnValueOnce({
+              neq: vi.fn().mockResolvedValue({ count: null, error: null })
+            })
+          };
+        }
+        if (table === 'ai_recommendations') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis().mockReturnValueOnce({
+              eq: vi.fn().mockResolvedValue({ count: null, error: null })
+            })
+          };
+        }
+      });
+      (supabase.from as any) = mockFrom;
+
+      (dashboardService.getDashboardGateStatus as any).mockResolvedValue([]);
+      (queueService.fetchQueueMetrics as any).mockResolvedValue([]);
+
+      const snapshot = await opsService.fetchCommandCenterSnapshot('match-123');
+
+      expect(snapshot.activeIncidentsCount).toBe(0);
+      expect(snapshot.activeAdvisoriesCount).toBe(0);
+      expect(snapshot.congestedGatesCount).toBe(0);
+      expect(snapshot.highQueueFacilitiesCount).toBe(0);
+    });
+  });
+
+  describe('fetchOperationsHotspots', () => {
+    it('rejects when ops session is missing', async () => {
+      vi.mocked(requireOpsSession).mockRejectedValueOnce(new Error('Forbidden'));
+
+      await expect(opsService.fetchOperationsHotspots('match-1', 'stad-1')).rejects.toThrow('Forbidden');
+      expect(dashboardService.getDashboardGateStatus).not.toHaveBeenCalled();
+      expect(facilityService.fetchFacilities).not.toHaveBeenCalled();
+    });
+
+    it('fetches hotspots successfully and sorts by crowd', async () => {
+      (dashboardService.getDashboardGateStatus as any).mockResolvedValue([
+        { gate: 'Gate A', crowd: 'High', waitTime: 15 }
+      ]);
+      (facilityService.fetchFacilities as any).mockResolvedValue([
+        { id: '1', crowd: 'Low' },
+        { id: '2', crowd: 'High' },
+        { id: '3', crowd: 'Medium' }
+      ]);
+
+      const data = await opsService.fetchOperationsHotspots('match-1', 'stad-1');
+      expect(data.gates.length).toBe(1);
+      // High (id 2) should be first, Medium (id 3) second, Low (id 1) last
+      expect(data.facilities[0].id).toBe('2');
+      expect(data.facilities[1].id).toBe('3');
+      expect(data.facilities[2].id).toBe('1');
+    });
+
+    it('rejects when hotspot context is invalid', async () => {
+      await expect(opsService.fetchOperationsHotspots('', 'stad-1')).rejects.toThrow('Invalid operations hotspots context.');
+      await expect(opsService.fetchOperationsHotspots('match-1', '')).rejects.toThrow('Invalid operations hotspots context.');
+    });
+
+    it('handles failure when facility service throws error', async () => {
+      (dashboardService.getDashboardGateStatus as any).mockResolvedValue([]);
+      (facilityService.fetchFacilities as any).mockRejectedValue(new Error('Facility error'));
+
+      await expect(opsService.fetchOperationsHotspots('match-1', 'stad-1')).rejects.toThrow('Facility error');
+    });
   });
 });

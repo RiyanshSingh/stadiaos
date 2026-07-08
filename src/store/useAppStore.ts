@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { Profile, Match, Ticket } from '@/lib/types/domain'
 import { bootstrapService } from '@/services/bootstrapService'
 import { supabase } from '@/services/supabase'
+import { triageService } from '@/services/triageService'
 
 export type Message = {
   id: string;
@@ -23,13 +24,41 @@ export type Incident = {
   aiAction?: string;
 }
 
+const normalizeIncidentRow = (row: any): Incident => ({
+  id: row.id,
+  type: row.incident_type,
+  reporterId: row.reported_by,
+  description: row.description || '',
+  severity: row.severity || 'medium',
+  status: row.status,
+  zone: row.description?.split('|')[0]?.replace('Location: ', '')?.trim() || 'Unknown',
+  timestamp: new Date(row.created_at),
+  aiSummary: row.ai_summary,
+  aiAction: row.ai_recommended_actions?.action,
+});
+
+const fetchActiveIncidents = async (): Promise<Incident[]> => {
+  const { data, error } = await supabase
+    .from('incidents')
+    .select('*')
+    .neq('status', 'resolved')
+    .order('created_at', { ascending: false });
+
+  if (error || !data) {
+    console.error('Failed to load active incidents', error);
+    return [];
+  }
+
+  return data.map(normalizeIncidentRow);
+};
+
 interface AppState {
   messages: Message[];
   addMessage: (msg: Omit<Message, 'id' | 'timestamp'>) => void;
   isTyping: boolean;
   incidents: Incident[];
-  reportIncident: (incident: Omit<Incident, 'id' | 'timestamp' | 'status'>) => void;
-  resolveIncident: (id: string) => void;
+  reportIncident: (incident: Omit<Incident, 'id' | 'timestamp' | 'status'>) => Promise<void>;
+  resolveIncident: (id: string) => Promise<void>;
   initSupabase: () => Promise<void>;
   
   // Bootstrap data
@@ -74,59 +103,68 @@ export const useAppStore = create<AppState>((set, get) => ({
   reportIncident: async (incident) => {
     try {
       const state = get();
-      const matchId = state.match?.id || null;
-      const stadiumId = state.match?.stadium_id || null;
-      const userId = state.profile?.id || null;
-      
-      const { triageService } = await import('@/services/triageService');
+      const matchId = state.match?.id;
+      const stadiumId = state.match?.stadium_id;
+      const userId = state.profile?.id;
+
+      if (!matchId || !stadiumId || !userId) {
+        console.error('Missing app context for incident report.');
+        return;
+      }
+
       const triage = await triageService.analyzeIncident({
         type: incident.type,
         zone: incident.zone,
         description: incident.description
       });
 
+      const severity = triage.severity || incident.severity || 'medium';
       const newIncident: Incident = {
         ...incident,
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).slice(2, 11),
         timestamp: new Date(),
         status: 'reported',
         aiSummary: triage.summary,
         aiAction: triage.action,
-        severity: triage.severity as any || incident.severity || 'medium'
+        severity
       };
-      
-      // Update local state immediately for fast feedback
+
       set((state) => ({ incidents: [newIncident, ...state.incidents] }));
 
-      // Insert into Supabase with context
       const { error } = await supabase
         .from('incidents')
-        .insert([{
-           title: incident.type,
-           incident_type: incident.type,
-           description: `Location: ${incident.zone} | ${incident.description}`,
-           severity: triage.severity || incident.severity || 'medium',
-           status: 'reported',
-           ai_summary: triage.summary,
-           zone_id: null, // Note: ideally we'd map zone string to zone_id
-           match_id: matchId,
-           stadium_id: stadiumId,
-           reported_by: userId,
-           reporter_role: 'fan'
-        }]);
+        .insert([
+          {
+            title: incident.type,
+            incident_type: incident.type,
+            description: `Location: ${incident.zone} | ${incident.description}`,
+            severity,
+            status: 'reported',
+            ai_summary: triage.summary,
+            zone_id: null,
+            match_id: matchId,
+            stadium_id: stadiumId,
+            reported_by: userId,
+            reporter_role: 'fan'
+          }
+        ]);
 
       if (error) {
-        console.error("Supabase insert error:", error);
+        console.error('Supabase insert error:', error);
       }
     } catch (error) {
-       console.error("Supabase Error:", error);
+      console.error('Supabase Error:', error);
     }
   },
   resolveIncident: async (id) => {
-    // Optimistic update
+    if (!id) {
+      return;
+    }
+
     set((state) => ({
-      incidents: state.incidents.map(inc => inc.id === id ? { ...inc, status: 'resolved' } : inc)
-    }))
+      incidents: state.incidents.map((inc) => (inc.id === id ? { ...inc, status: 'resolved' } : inc))
+    }));
+
     try {
       await supabase.from('incidents').update({ status: 'resolved' }).eq('id', id);
     } catch (error) {
@@ -135,63 +173,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   initSupabase: async () => {
     try {
-      // Fetch existing unresolved incidents
-      const { data, error } = await supabase
-        .from('incidents')
-        .select('*')
-        .neq('status', 'resolved')
-        .order('created_at', { ascending: false });
-        
-      if (data && !error) {
-        const dbIncidents: Incident[] = data.map((d: any) => ({
-          id: d.id,
-          type: d.incident_type,
-          reporterId: d.reported_by,
-          description: d.description || '',
-          severity: d.severity,
-          status: d.status,
-          zone: d.description?.split('|')[0]?.replace('Location: ', '')?.trim() || 'Unknown',
-          timestamp: new Date(d.created_at),
-          aiSummary: d.ai_summary,
-          aiAction: d.ai_recommended_actions?.action,
-        }));
-        set({ incidents: dbIncidents });
-      }
+      const dbIncidents = await fetchActiveIncidents();
+      set({ incidents: dbIncidents });
 
-      // Subscribe to real-time changes on incidents safely
-      let channel = supabase.getChannels().find(c => c.topic === 'realtime:appstore_incidents_channel');
-      if (!channel) {
+      const channelExists = supabase.getChannels().some((c: any) => c.topic === 'realtime:appstore_incidents_channel');
+      if (!channelExists) {
         supabase
           .channel('appstore_incidents_channel')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'incidents' }, () => {
-            // For simplicity, just refetch all active incidents on any change
-            supabase
-              .from('incidents')
-              .select('*')
-              .neq('status', 'resolved')
-              .order('created_at', { ascending: false })
-              .then(({ data }) => {
-                if (data) {
-                  const refreshedIncidents: Incident[] = data.map((d: any) => ({
-                    id: d.id,
-                    type: d.incident_type,
-                    reporterId: d.reported_by,
-                    description: d.description || '',
-                    severity: d.severity,
-                    status: d.status,
-                    zone: d.description?.split('|')[0]?.replace('Location: ', '')?.trim() || 'Unknown',
-                    timestamp: new Date(d.created_at),
-                    aiSummary: d.ai_summary,
-                    aiAction: d.ai_recommended_actions?.action,
-                  }));
-                  set({ incidents: refreshedIncidents });
-                }
-              });
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'incidents' }, async () => {
+            const refreshedIncidents = await fetchActiveIncidents();
+            set({ incidents: refreshedIncidents });
           })
           .subscribe();
       }
     } catch (error) {
-      console.error("Failed to init Supabase", error);
+      console.error('Failed to init Supabase', error);
     }
   }
 }))

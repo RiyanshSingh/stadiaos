@@ -12,20 +12,29 @@ export function AlertComposer() {
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handlePublish = async () => {
-    if (!matchId || !stadiumId || !title.trim() || !content.trim() || publishing) return;
-    
+  const handlePublish = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!matchId || !stadiumId) {
+      setErrorMsg('Unable to publish advisory: missing venue or match context.');
+      return;
+    }
+    if (!title.trim() || !content.trim()) {
+      setErrorMsg('Please enter both a headline and message for the advisory.');
+      return;
+    }
+    if (publishing) return;
+
     setPublishing(true);
     setErrorMsg(null);
     try {
-      await opsService.publishPublicAdvisory(matchId, stadiumId, title, content);
+      await opsService.publishPublicAdvisory(matchId, stadiumId, title.trim(), content.trim());
       setSuccess(true);
       setTitle('');
       setContent('');
       setTimeout(() => setSuccess(false), 3000);
     } catch (e: any) {
-      console.error(e);
-      setErrorMsg(e.message || 'Failed to publish advisory');
+      console.error('Publish advisory failed', e);
+      setErrorMsg(e?.message || 'Failed to publish advisory.');
     } finally {
       setPublishing(false);
     }
@@ -36,43 +45,51 @@ export function AlertComposer() {
       <h2 className="text-[11px] font-bold text-white/60 uppercase tracking-widest mb-4 px-2">Public Advisory Broadcast</h2>
       
       <Card className="glass-card p-6 border border-white/5 rounded-3xl bg-white/[0.02]">
-        <div className="space-y-6">
+        <form onSubmit={handlePublish} className="space-y-6">
           {errorMsg && (
-            <div role="alert" className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200/90 text-[13px] font-medium">
+            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200/90 text-[13px] font-medium">
               {errorMsg}
             </div>
           )}
 
-          <div>
-            <label htmlFor="advisory-title" className="text-[10px] text-white/60 uppercase tracking-widest font-bold block mb-2">Headline</label>
-            <input 
-              id="advisory-title"
-              type="text" 
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="e.g. Delays on East Concourse" 
-              className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-medium w-full focus:outline-none focus:border-white/30 transition-colors placeholder-white/40"
-            />
-          </div>
-          <div>
-            <label htmlFor="advisory-content" className="text-[10px] text-white/60 uppercase tracking-widest font-bold block mb-2">Message</label>
-            <textarea 
-              id="advisory-content"
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              placeholder="Provide context and instructions for fans..." 
-              className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-medium w-full h-24 resize-none focus:outline-none focus:border-white/30 transition-colors placeholder-white/40 custom-scrollbar"
-            />
-          </div>
+          <fieldset className="space-y-6 border border-white/10 rounded-3xl p-4">
+            <legend className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Advisory content</legend>
+
+            <div>
+              <label htmlFor="advisory-title" className="text-[10px] text-white/60 uppercase tracking-widest font-bold block mb-2">Headline</label>
+              <input 
+                id="advisory-title"
+                type="text" 
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="e.g. Delays on East Concourse" 
+                className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-medium w-full focus:outline-none focus:border-white/30 transition-colors placeholder-white/40"
+                required
+                aria-required="true"
+              />
+            </div>
+            <div>
+              <label htmlFor="advisory-content" className="text-[10px] text-white/60 uppercase tracking-widest font-bold block mb-2">Message</label>
+              <textarea 
+                id="advisory-content"
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                placeholder="Provide context and instructions for fans..." 
+                className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-medium w-full h-24 resize-none focus:outline-none focus:border-white/30 transition-colors placeholder-white/40 custom-scrollbar"
+                required
+                aria-required="true"
+              />
+            </div>
+          </fieldset>
           
           <button 
-            onClick={handlePublish}
+            type="submit"
             disabled={!title.trim() || !content.trim() || publishing || success}
             className="w-full h-12 bg-white text-black font-bold rounded-xl text-[13px] uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-40 disabled:bg-white/10 disabled:text-white transition-all"
           >
             {publishing ? 'Broadcasting...' : success ? <><CheckCircle2 className="w-4 h-4" /> Broadcast Sent</> : <><Send className="w-4 h-4" /> Broadcast Advisory</>}
           </button>
-        </div>
+        </form>
       </Card>
     </section>
   );

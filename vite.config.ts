@@ -15,5 +15,19 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     globals: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor';
+            if (id.includes('framer-motion') || id.includes('lucide-react')) return 'ui';
+            if (id.includes('@supabase') || id.includes('zustand')) return 'data';
+            return 'vendor';
+          }
+        }
+      }
+    }
   }
 })

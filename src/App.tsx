@@ -201,9 +201,9 @@ function App() {
         </a>
         <ErrorBoundary>
           <MobileFrame>
-            <div id="main-content">
+            <main id="main-content" role="main">
               <AnimatedRoutes />
-            </div>
+            </main>
           </MobileFrame>
         </ErrorBoundary>
       </div>

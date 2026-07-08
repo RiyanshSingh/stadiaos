@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { Home, Compass, MessageSquare, User } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-export function BottomNav() {
+export const BottomNav = memo(function BottomNav() {
   const location = useLocation()
   const [hidden, setHidden] = useState(false)
   
@@ -81,4 +81,4 @@ export function BottomNav() {
       </nav>
     </motion.div>
   )
-}
+});

@@ -18,6 +18,9 @@ const SECTION_TO_ROUTING_KEY: Record<string, string> = {
 /** Map common amenity type / label to routing keys */
 const LABEL_TO_ROUTING_KEY: Record<string, string> = {
   'food':              ROUTING_KEYS.FOOD_NORTH,
+  'cafeteria':         ROUTING_KEYS.FOOD_NORTH,
+  'concession':        ROUTING_KEYS.FOOD_NORTH,
+  'concessions':       ROUTING_KEYS.FOOD_NORTH,
   'burger grill':      ROUTING_KEYS.FOOD_NORTH,
   'coffee':            ROUTING_KEYS.FOOD_SOUTH,
   'washroom':          ROUTING_KEYS.WASHROOM_NORTH,

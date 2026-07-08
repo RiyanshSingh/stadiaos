@@ -1,35 +1,41 @@
 import { supabase } from '@/services/supabase';
 import type { QueueMetric } from '@/lib/types/domain';
 
+type QueueMetricRow = QueueMetric;
+
+const deduplicateLatestQueueMetrics = (metrics: QueueMetricRow[]): QueueMetricRow[] => {
+  const latestByAmenity = new Map<string, QueueMetricRow>();
+
+  for (const metric of metrics) {
+    if (!latestByAmenity.has(metric.amenity_id)) {
+      latestByAmenity.set(metric.amenity_id, metric);
+    }
+  }
+
+  return Array.from(latestByAmenity.values());
+};
+
 export const queueService = {
   fetchQueueMetrics: async (matchId: string): Promise<QueueMetric[]> => {
     const { data, error } = await supabase
-      .from('queue_metrics')
+      .from<QueueMetric>('queue_metrics')
       .select('*')
       .eq('match_id', matchId)
       .order('captured_at', { ascending: false });
 
-    if (error) {
-      console.error('Failed to fetch queue metrics:', error);
+    if (error || !data) {
+      if (error) {
+        console.error('Failed to fetch queue metrics:', error);
+      }
       return [];
     }
-    
-    // De-duplicate to get latest per amenity
-    const seen = new Set();
-    const latest: QueueMetric[] = [];
-    for (const metric of data as QueueMetric[]) {
-      if (!seen.has(metric.amenity_id)) {
-        seen.add(metric.amenity_id);
-        latest.push(metric);
-      }
-    }
 
-    return latest;
+    return deduplicateLatestQueueMetrics(data);
   },
   
   fetchQueueMetricForAmenity: async (matchId: string, amenityId: string): Promise<QueueMetric | null> => {
     const { data, error } = await supabase
-      .from('queue_metrics')
+      .from<QueueMetric>('queue_metrics')
       .select('*')
       .eq('match_id', matchId)
       .eq('amenity_id', amenityId)
@@ -38,12 +44,12 @@ export const queueService = {
       .single();
 
     if (error) {
-      if (error.code !== 'PGRST116') { // not found is ok
+      if (error.code !== 'PGRST116') {
         console.error('Failed to fetch queue metric:', error);
       }
       return null;
     }
 
-    return data as QueueMetric;
+    return data ?? null;
   }
 };

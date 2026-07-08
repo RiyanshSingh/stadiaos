@@ -6,7 +6,7 @@ vi.mock('../supabase', () => ({
   supabase: {
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockImplementation((col, val) => {
+    eq: vi.fn().mockImplementation((col, _val) => {
       // Return a chainable object that eventually resolves or allows neq
       const chain = {
         neq: vi.fn().mockResolvedValue({

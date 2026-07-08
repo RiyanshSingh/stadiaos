@@ -26,37 +26,149 @@ Rules:
 - If it's none of these, or generic chat, return UNKNOWN. Do not try to answer general knowledge questions.
 `;
 
-function fallbackParse(msg: string): CopilotIntent {
+const VALID_INTENTS = ['FACILITY_LOOKUP', 'ROUTE_HANDOFF', 'INCIDENT_DRAFT', 'ALERTS_STATUS', 'TICKET_CONTEXT', 'VENUE_FAQ', 'UNKNOWN'] as const;
+
+type ValidIntent = (typeof VALID_INTENTS)[number];
+
+function isValidIntent(intent: unknown): intent is ValidIntent {
+  return typeof intent === 'string' && VALID_INTENTS.includes(intent as ValidIntent);
+}
+
+function extractDestination(msg: string): string | undefined {
   const lowerMsg = msg.toLowerCase();
-  
-  if (lowerMsg.match(/(washroom|restroom|toilet|food|drink|coffee|medical)/)) {
-    let type = 'washroom';
-    if (lowerMsg.match(/(food|drink|coffee)/)) type = 'food';
-    if (lowerMsg.match(/medical/)) type = 'medical';
-    return { intent: 'FACILITY_LOOKUP', facility_type: type };
-  }
-  
-  if (lowerMsg.match(/(fainted|emergency|security|help|incident|medical issue|lost person)/)) {
-    return { intent: 'INCIDENT_DRAFT', description: msg, incident_type: 'general', severity: 'medium' };
-  }
-  
-  if (lowerMsg.match(/(alert|warning|congestion|happening|issue)/)) {
-    return { intent: 'ALERTS_STATUS' };
-  }
-  
-  if (lowerMsg.match(/(route|take me|how do i get|directions|gate)/)) {
-    return { intent: 'ROUTE_HANDOFF', destination: 'your destination' };
+  const seatMatch = lowerMsg.match(/(?:my\s*)?(seat|section\s*\d+|row\s*[a-z0-9]+)/);
+  if (seatMatch) {
+    return 'my seat';
   }
 
-  if (lowerMsg.match(/(seat|sitting|ticket|section|row)/)) {
+  const gateMatch = lowerMsg.match(/gate\s*([a-z0-9]+)/);
+  if (gateMatch) {
+    return `gate ${gateMatch[1].toUpperCase()}`;
+  }
+
+  if (lowerMsg.includes('main gate') || lowerMsg.includes('front gate')) {
+    return 'gate A';
+  }
+
+  if (lowerMsg.includes('exit')) {
+    return 'nearest exit';
+  }
+
+  if (lowerMsg.includes('concourse')) {
+    return 'nearest concourse';
+  }
+
+  if (lowerMsg.includes('vip') || lowerMsg.includes('premium')) {
+    return 'VIP entrance';
+  }
+
+  return undefined;
+}
+
+function extractIncidentSeverity(msg: string): CopilotIntent['severity'] {
+  const lowerMsg = msg.toLowerCase();
+  if (lowerMsg.match(/(critical|life threatening|severe|urgent|immediately|dangerous)/)) {
+    return 'critical';
+  }
+  if (lowerMsg.match(/(high|serious|major|very bad|fainted|collapse|hurt|medical)/)) {
+    return 'high';
+  }
+  if (lowerMsg.match(/(spill|wet floor|slow|lost|leave|security)/)) {
+    return 'medium';
+  }
+  return 'low';
+}
+
+function extractIncidentLocation(msg: string): string | undefined {
+  const lowerMsg = msg.toLowerCase();
+  const sectionMatch = lowerMsg.match(/section\s*\d+/);
+  if (sectionMatch) return sectionMatch[0];
+  const rowMatch = lowerMsg.match(/row\s*[a-z0-9]+/);
+  if (rowMatch) return rowMatch[0];
+  const nearMatch = lowerMsg.match(/near\s+([a-z0-9\s]+)/);
+  if (nearMatch) return nearMatch[1].trim();
+  return undefined;
+}
+
+function fallbackParse(msg: string): CopilotIntent {
+  const lowerMsg = msg.toLowerCase();
+
+  if (lowerMsg.match(/(washroom|restroom|toilet|food|drink|coffee|medical)/)) {
+    let type = 'washroom';
+    if (lowerMsg.match(/(food|drink|coffee|restaurant|concession|snack)/)) type = 'food';
+    if (lowerMsg.match(/medical|first aid|help desk/)) type = 'medical';
+    if (lowerMsg.match(/(toilet|restroom|washroom)/)) type = 'washroom';
+    return { intent: 'FACILITY_LOOKUP', facility_type: type };
+  }
+
+  if (lowerMsg.match(/(fainted|emergency|security|help|incident|medical issue|lost person|hazard|spill|fire|injured|collapse)/)) {
+    const incidentType = lowerMsg.match(/(medical|fainted|spill|harassment|lost child|security|fire|hazard|injury|injured)/)?.[1] ?? 'general';
+    const normalizedType = incidentType === 'fainted' ? 'medical' : incidentType;
+    return {
+      intent: 'INCIDENT_DRAFT',
+      description: msg,
+      incident_type: normalizedType,
+      location: extractIncidentLocation(msg),
+      severity: extractIncidentSeverity(msg)
+    };
+  }
+
+  if (lowerMsg.match(/(alert|warning|congestion|happening|issue|delay|advisory|current alert)/)) {
+    return { intent: 'ALERTS_STATUS' };
+  }
+
+  if (lowerMsg.match(/(route|take me|how do i get|directions|gate|exit|seat|my seat|wheelchair|accessible|accessibility)/)) {
+    return { intent: 'ROUTE_HANDOFF', destination: extractDestination(msg) ?? 'your destination' };
+  }
+
+  if (lowerMsg.match(/(seat|sitting|ticket|section|row|my ticket|where am i|where am i sitting)/)) {
     return { intent: 'TICKET_CONTEXT' };
   }
-  
-  if (lowerMsg.match(/(bag|bottle|policy|allowed|power bank|accessibility)/)) {
+
+  if (lowerMsg.match(/(bag|bottle|policy|allowed|power bank|accessibility|patrons|staff|rules|entry|security check)/)) {
     return { intent: 'VENUE_FAQ', question: msg };
   }
 
   return { intent: 'UNKNOWN' };
+}
+
+type IntentResponse = Partial<CopilotIntent> & { intent?: unknown };
+
+type TriageSeverity = CopilotIntent['severity'];
+
+const normalizeSeverity = (value: unknown): TriageSeverity | undefined => {
+  if (value === 'low' || value === 'medium' || value === 'high' || value === 'critical') {
+    return value;
+  }
+  return undefined;
+};
+
+function parseIntentResponse(rawContent: unknown, userMessage: string): CopilotIntent {
+  if (typeof rawContent !== 'string') {
+    return fallbackParse(userMessage);
+  }
+
+  try {
+    const payload = JSON.parse(rawContent) as IntentResponse;
+    const intent = isValidIntent(payload.intent) ? payload.intent : 'UNKNOWN';
+
+    if (intent === 'UNKNOWN') {
+      return fallbackParse(userMessage);
+    }
+
+    return {
+      intent,
+      facility_type: typeof payload.facility_type === 'string' ? payload.facility_type : undefined,
+      destination: typeof payload.destination === 'string' ? payload.destination : undefined,
+      incident_type: typeof payload.incident_type === 'string' ? payload.incident_type : undefined,
+      description: typeof payload.description === 'string' ? payload.description : undefined,
+      location: typeof payload.location === 'string' ? payload.location : undefined,
+      severity: normalizeSeverity(payload.severity),
+      question: typeof payload.question === 'string' ? payload.question : undefined
+    };
+  } catch {
+    return fallbackParse(userMessage);
+  }
 }
 
 export const copilotIntentService = {
@@ -67,26 +179,16 @@ export const copilotIntentService = {
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: userMessage }
         ],
-        model: 'llama-3.1-8b-instant', // Fast model for JSON extraction
+        model: 'llama-3.1-8b-instant',
         response_format: { type: 'json_object' }
       });
 
-      const content = completion.choices[0]?.message?.content || '{}';
-      let parsed = JSON.parse(content) as CopilotIntent;
-      
-      // Ensure the intent is valid
-      const validIntents = ['FACILITY_LOOKUP', 'ROUTE_HANDOFF', 'INCIDENT_DRAFT', 'ALERTS_STATUS', 'TICKET_CONTEXT', 'VENUE_FAQ', 'UNKNOWN'];
-      if (!validIntents.includes(parsed.intent)) {
-        parsed.intent = 'UNKNOWN';
-      }
-      
-      if (parsed.intent === 'UNKNOWN') {
-        parsed = fallbackParse(userMessage);
-      }
-      
+      const content = completion.choices?.[0]?.message?.content;
+      const parsed = parseIntentResponse(content, userMessage);
+
       console.log('[Copilot Pipeline] Input:', userMessage);
       console.log('[Copilot Pipeline] Intent:', parsed.intent);
-      
+
       return parsed;
     } catch (error) {
       console.error('Groq Intent Parsing Error:', error);

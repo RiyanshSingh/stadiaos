@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import type { Amenity } from '@/lib/types/domain';
+import type { Amenity, Zone, QueueMetric } from '@/lib/types/domain';
 import { queueService } from './queueService';
 
 export type FacilityViewModel = {
@@ -13,82 +13,62 @@ export type FacilityViewModel = {
   accessible: boolean;
 };
 
+type AmenityRow = Amenity & {
+  zone?: Zone | null;
+};
+
+const mapQueueToCrowd = (queueScore: number): FacilityViewModel['crowd'] => {
+  if (queueScore > 0.7) return 'High';
+  if (queueScore > 0.4) return 'Medium';
+  return 'Low';
+};
+
+const fromAmenity = (amenity: AmenityRow, queueMetric?: QueueMetric): FacilityViewModel => {
+  const wait = queueMetric ? `${queueMetric.estimated_wait_minutes} mins` : '0 mins';
+  const crowd = queueMetric ? mapQueueToCrowd(queueMetric.queue_score) : 'Low';
+
+  return {
+    id: amenity.id,
+    name: amenity.name,
+    type: amenity.amenity_type,
+    zone: amenity.zone?.name || 'Unknown Zone',
+    wait,
+    crowd,
+    distance: 'TBD',
+    accessible: amenity.is_accessible,
+  };
+};
+
 export const facilityService = {
   fetchFacilities: async (stadiumId: string, matchId: string): Promise<FacilityViewModel[]> => {
-    const TEMPLATE_STADIUM_ID = '11111111-1111-1111-1111-111111111111';
+    const stadiumQueryId = stadiumId || '11111111-1111-1111-1111-111111111111';
 
-    // 1. Fetch amenities + zones
     const { data: amenities, error } = await supabase
-      .from('amenities')
+      .from<AmenityRow>('amenities')
       .select('*, zone:zones(*)')
-      .eq('stadium_id', TEMPLATE_STADIUM_ID);
+      .eq('stadium_id', stadiumQueryId);
 
     if (error || !amenities) {
       console.error('Failed to fetch facilities:', error);
       return [];
     }
 
-    // 2. Fetch latest queue metrics
     const queueMetrics = await queueService.fetchQueueMetrics(matchId);
-    const queueMap = new Map(queueMetrics.map(q => [q.amenity_id, q]));
+    const queueMap = new Map<string, QueueMetric>(queueMetrics.map((q) => [q.amenity_id, q]));
 
-    // 3. Map to view model
-    return (amenities as Amenity[]).map(amenity => {
-      const q = queueMap.get(amenity.id);
-      
-      // Basic heuristic for wait/crowd
-      let wait = '0 mins';
-      let crowd: 'Low' | 'Medium' | 'High' = 'Low';
-      
-      if (q) {
-        wait = `${q.estimated_wait_minutes} mins`;
-        if (q.queue_score > 0.7) crowd = 'High';
-        else if (q.queue_score > 0.4) crowd = 'Medium';
-      }
-
-      return {
-        id: amenity.id,
-        name: amenity.name,
-        type: amenity.amenity_type,
-        zone: amenity.zone?.name || 'Unknown Zone',
-        wait,
-        crowd,
-        distance: 'TBD', // We don't have routing yet
-        accessible: amenity.is_accessible,
-      };
-    });
+    return amenities.map((amenity) => fromAmenity(amenity, queueMap.get(amenity.id)));
   },
 
   fetchFacilityById: async (id: string, matchId: string): Promise<FacilityViewModel | null> => {
     const { data, error } = await supabase
-      .from('amenities')
+      .from<AmenityRow>('amenities')
       .select('*, zone:zones(*)')
       .eq('id', id)
       .single();
 
     if (error || !data) return null;
-    
-    const amenity = data as Amenity;
-    const q = await queueService.fetchQueueMetricForAmenity(matchId, amenity.id);
-    
-    let wait = '0 mins';
-    let crowd: 'Low' | 'Medium' | 'High' = 'Low';
-    
-    if (q) {
-      wait = `${q.estimated_wait_minutes} mins`;
-      if (q.queue_score > 0.7) crowd = 'High';
-      else if (q.queue_score > 0.4) crowd = 'Medium';
-    }
 
-    return {
-      id: amenity.id,
-      name: amenity.name,
-      type: amenity.amenity_type,
-      zone: amenity.zone?.name || 'Unknown Zone',
-      wait,
-      crowd,
-      distance: 'TBD',
-      accessible: amenity.is_accessible,
-    };
+    const queueMetric = await queueService.fetchQueueMetricForAmenity(matchId, data.id);
+    return fromAmenity(data, queueMetric ?? undefined);
   }
 };

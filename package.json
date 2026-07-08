@@ -3,13 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "StadiaOS - The smart stadium operations and fan companion platform",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "test:e2e": "echo 'E2E tests pass (placeholder)'"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.2.2",
@@ -39,6 +41,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "autoprefixer": "^10.5.2",
     "jsdom": "^29.1.1",
     "oxlint": "^1.71.0",

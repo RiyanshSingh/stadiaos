@@ -1,7 +1,16 @@
 import { create } from 'zustand';
 import { supabase } from './supabase';
+import { useAppStore } from '@/store/useAppStore';
+import type { Profile, Match } from '@/lib/types/domain';
 
-type Role = 'fan' | 'ops_manager' | null;
+type Role = Profile['role'] | null;
+
+type SupabaseUserSession = {
+  user?: {
+    id?: string;
+    email?: string | null;
+  };
+} | null;
 
 interface AuthState {
   isInitialized: boolean;
@@ -12,14 +21,12 @@ interface AuthState {
   opsStadiumId: string | null;
   email: string | null;
   fullName: string | null;
-  
-  // App specific context actions
+
   setOpsMatchContext: (matchId: string | null) => void;
   setOpsStadiumContext: (stadiumId: string | null) => void;
   setFanTicketContext: () => void;
-  
-  // Supabase bridging
-  initAuth: () => void;
+
+  initAuth: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -35,75 +42,101 @@ export const useAuthService = create<AuthState>((set, get) => ({
 
   setOpsMatchContext: (matchId) => set({ matchId }),
   setOpsStadiumContext: (opsStadiumId) => set({ opsStadiumId }),
-  
+
   setFanTicketContext: () => {
     // Just trigger a re-render or signal we are ready.
     // The actual context comes from the tickets table and bootstrapService.
   },
 
-  initAuth: () => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email);
-      } else {
-        set({ isInitialized: true, userId: null, role: null, matchId: null, stadiumId: null, email: null, fullName: null });
-      }
-    });
+  initAuth: async (): Promise<void> => {
+    const resetAuthState = () => {
+      set({
+        isInitialized: true,
+        userId: null,
+        role: null,
+        matchId: null,
+        stadiumId: null,
+        opsStadiumId: null,
+        email: null,
+        fullName: null
+      });
+    };
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email);
-      } else {
-        set({ isInitialized: true, userId: null, role: null, matchId: null, stadiumId: null, email: null, fullName: null });
-      }
-    });
+    const fetchProfile = async (uid: string, email?: string | null) => {
+      const { data, error } = await supabase
+        .from<Profile>('profiles')
+        .select('*')
+        .eq('id', uid)
+        .maybeSingle();
 
-    async function fetchProfile(uid: string, email: string | undefined) {
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', uid).maybeSingle();
-      
       let profileData = data;
 
-      // Fallback if trigger hasn't run yet
       if (!profileData && !error) {
-        const { data: newProfile } = await supabase.from('profiles').insert([{
-          id: uid,
-          email: email || '',
-          role: 'fan',
-          full_name: email ? email.split('@')[0] : 'Fan'
-        }]).select().maybeSingle();
+        const { data: newProfile } = await supabase
+          .from<Profile>('profiles')
+          .insert([
+            {
+              id: uid,
+              email: email || '',
+              role: 'fan',
+              full_name: email ? email.split('@')[0] : 'Fan'
+            }
+          ])
+          .select()
+          .maybeSingle();
+
         profileData = newProfile;
       }
 
-      if (profileData) {
-        set({
-          isInitialized: true,
-          userId: uid,
-          role: profileData.role as Role,
-          email: profileData.email || email || null,
-          fullName: profileData.full_name || null
-        });
-        
-        // If ops manager and no matchId, default to latest scheduled/live match
-        if (profileData.role === 'ops_manager' && !get().matchId) {
-          const { data: matches } = await supabase
-            .from('matches')
-            .select('id, stadium_id')
-            .in('status', ['live', 'scheduled'])
-            .order('start_time', { ascending: true })
-            .limit(1);
-            
-          if (matches && matches.length > 0) {
-            set({ matchId: matches[0].id, stadiumId: matches[0].stadium_id });
-          }
-        }
-      } else {
-        set({ isInitialized: true });
+      if (!profileData || error) {
+        resetAuthState();
+        return;
       }
+
+      set({
+        isInitialized: true,
+        userId: uid,
+        role: profileData.role,
+        email: profileData.email || email || null,
+        fullName: profileData.full_name || null
+      });
+
+      if (profileData.role === 'ops_manager' && !get().matchId) {
+        const { data: matches } = await supabase
+          .from<Match>('matches')
+          .select('id, stadium_id')
+          .in('status', ['live', 'scheduled'])
+          .order('start_time', { ascending: true })
+          .limit(1);
+
+        if (matches && matches.length > 0) {
+          set({ matchId: matches[0].id, stadiumId: matches[0].stadium_id });
+        }
+      }
+    };
+
+    const authStateHandler = async (_event: string, session: SupabaseUserSession) => {
+      if (session?.user?.id) {
+        await fetchProfile(session.user.id, session.user.email);
+      } else {
+        resetAuthState();
+      }
+    };
+
+    supabase.auth.onAuthStateChange(authStateHandler);
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.user?.id) {
+      await fetchProfile(session.user.id, session.user.email);
+    } else {
+      resetAuthState();
     }
   },
 
   logout: async () => {
     await supabase.auth.signOut();
+    useAppStore.getState().logout();
     set({
       userId: null,
       role: null,
@@ -113,7 +146,10 @@ export const useAuthService = create<AuthState>((set, get) => ({
       email: null,
       fullName: null
     });
-    // Clear legacy persisted auth from localStorage if it exists
-    try { localStorage.removeItem('stadiaos-auth-storage'); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem('stadiaos-auth-storage');
+    } catch {
+      // ignore browser storage cleanup failures
+    }
   }
 }));

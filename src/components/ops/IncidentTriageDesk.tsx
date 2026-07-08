@@ -85,63 +85,64 @@ export function IncidentTriageDesk() {
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                   transition={{ delay: Math.min(idx * 0.1, 0.5) }}
                 >
-                  <Card 
-                    role="button"
-                    tabIndex={0}
-                    aria-expanded={isExpanded}
+                  <Card
                     className={cn(
-                      "glass-card border bg-white/[0.03] rounded-3xl transition-colors overflow-hidden group cursor-pointer text-left w-full",
-                      isCritical ? 'border-white/20 hover:bg-white/[0.05]' : 'border-white/5 hover:bg-white/[0.04]'
+                      "glass-card border bg-white/[0.03] rounded-3xl transition-colors overflow-hidden group w-full",
+                      isCritical ? 'border-white/20' : 'border-white/5'
                     )}
-                    onClick={() => setExpandedId(isExpanded ? null : incident.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setExpandedId(isExpanded ? null : incident.id);
-                      }
-                    }}
                   >
                     <div className="p-6">
-                      
-                      {/* Top Strip */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                        <div className="flex items-center gap-2">
-                          <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border",
-                            isCritical ? 'bg-white/10 text-white border-white/20' : 'bg-white/5 text-white/60 border-white/10'
-                          )}>
-                            {incident.severity}
-                          </span>
-                          <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border",
-                            incident.status === 'in_progress' ? 'bg-white/10 text-white border-white/20' : 
-                            incident.status === 'assigned' ? 'bg-white/10 text-white/80 border-white/20' :
-                            'bg-white/5 text-white/60 border-transparent'
-                          )}>
-                            {incident.status.replace('_', ' ')}
+                      <button
+                        type="button"
+                        aria-expanded={isExpanded}
+                        aria-controls={`incident-panel-${incident.id}`}
+                        className={cn(
+                          "w-full text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60",
+                          isCritical ? 'cursor-pointer hover:bg-white/[0.05]' : 'cursor-pointer hover:bg-white/[0.04]'
+                        )}
+                        onClick={() => setExpandedId(isExpanded ? null : incident.id)}
+                      >
+                        {/* Top Strip */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border",
+                              isCritical ? 'bg-white/10 text-white border-white/20' : 'bg-white/5 text-white/60 border-white/10'
+                            )}>
+                              {incident.severity}
+                            </span>
+                            <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border",
+                              incident.status === 'in_progress' ? 'bg-white/10 text-white border-white/20' : 
+                              incident.status === 'assigned' ? 'bg-white/10 text-white/80 border-white/20' :
+                              'bg-white/5 text-white/60 border-transparent'
+                            )}>
+                              {incident.status.replace('_', ' ')}
+                            </span>
+                          </div>
+                          <span className="text-[11px] font-bold text-white/60 uppercase tracking-widest">
+                            {formatTime(incident.created_at)}
                           </span>
                         </div>
-                        <span className="text-[11px] font-bold text-white/60 uppercase tracking-widest">
-                          {formatTime(incident.created_at)}
-                        </span>
-                      </div>
-                      
-                      {/* Headline Block */}
-                      <div className="mb-2">
-                        <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold mb-1.5">{(incident.incident_type || 'General').replace('_', ' ')}</p>
-                        <h3 className="font-bold text-[17px] tracking-tight text-white/90 leading-snug">
-                          {incident.title || resolveDescription(incident.description) || 'Incident Reported'}
-                        </h3>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-white/60 mt-3">
-                        <MapPin className="w-3.5 h-3.5" />
-                        <span>{resolveLocation(incident.description)}</span>
-                      </div>
+
+                        {/* Headline Block */}
+                        <div className="mb-2">
+                          <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold mb-1.5">{(incident.incident_type || 'General').replace('_', ' ')}</p>
+                          <h3 className="font-bold text-[17px] tracking-tight text-white/90 leading-snug">
+                            {incident.title || resolveDescription(incident.description) || 'Incident Reported'}
+                          </h3>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[13px] font-medium text-white/60 mt-3">
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span>{resolveLocation(incident.description)}</span>
+                        </div>
+                      </button>
 
                       {isExpanded && (
-                        <motion.div 
-                          initial={{ opacity: 0, height: 0 }} 
-                          animate={{ opacity: 1, height: 'auto' }} 
+                        <motion.div
+                          id={`incident-panel-${incident.id}`}
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
                           className="mt-6 pt-6 border-t border-white/10 space-y-8"
-                          onClick={e => e.stopPropagation()} 
+                          onClick={e => e.stopPropagation()}
                         >
                           {/* AI Analysis */}
                           <div>
@@ -161,17 +162,19 @@ export function IncidentTriageDesk() {
                             <div>
                               <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/60 mb-3">Assign Team</h4>
                               <div className="flex flex-wrap gap-2">
-                                <button 
+                                <button
+                                  type="button"
                                   onClick={() => handleAssign(incident.id, 'security')}
-                                  className={cn("flex-1 h-10 rounded-xl border flex items-center justify-center gap-2 transition-colors text-[11px] font-bold uppercase tracking-widest", 
+                                  className={cn("flex-1 h-10 rounded-xl border flex items-center justify-center gap-2 transition-colors text-[11px] font-bold uppercase tracking-widest",
                                     incident.assigned_team === 'security' ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 hover:bg-white/10 text-white/70'
                                   )}
                                 >
                                   <Shield className="w-3.5 h-3.5" /> Security
                                 </button>
-                                <button 
+                                <button
+                                  type="button"
                                   onClick={() => handleAssign(incident.id, 'medical')}
-                                  className={cn("flex-1 h-10 rounded-xl border flex items-center justify-center gap-2 transition-colors text-[11px] font-bold uppercase tracking-widest", 
+                                  className={cn("flex-1 h-10 rounded-xl border flex items-center justify-center gap-2 transition-colors text-[11px] font-bold uppercase tracking-widest",
                                     incident.assigned_team === 'medical' ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 hover:bg-white/10 text-white/70'
                                   )}
                                 >
@@ -179,18 +182,20 @@ export function IncidentTriageDesk() {
                                 </button>
                               </div>
                             </div>
-                            
+
                             <div>
                               <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/60 mb-3">Update Status</h4>
                               <div className="flex flex-wrap gap-2">
-                                <button 
+                                <button
+                                  type="button"
                                   onClick={() => handleStatusChange(incident.id, incident.status, 'in_progress')}
                                   disabled={incident.status === 'in_progress'}
                                   className="flex-1 h-10 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:text-white/90 disabled:opacity-40 disabled:hover:bg-white/5 transition-colors text-[11px] font-bold uppercase tracking-widest"
                                 >
                                   In Progress
                                 </button>
-                                <button 
+                                <button
+                                  type="button"
                                   onClick={() => {
                                     handleStatusChange(incident.id, incident.status, 'resolved');
                                     setExpandedId(null);
@@ -208,16 +213,17 @@ export function IncidentTriageDesk() {
                             <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/60 mb-3">Ops Log Note</h4>
                             <div className="flex gap-2">
                               <label htmlFor={`note-${incident.id}`} className="sr-only">Incident Note</label>
-                              <input 
+                              <input
                                 id={`note-${incident.id}`}
-                                type="text" 
+                                type="text"
                                 value={noteText}
                                 onChange={e => setNoteText(e.target.value)}
-                                placeholder="Record an update or action taken..." 
+                                placeholder="Record an update or action taken..."
                                 className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-[13px] w-full focus:outline-none focus:border-white/30 text-white placeholder-white/40 font-medium"
                                 onKeyDown={e => { if (e.key === 'Enter') handleAddNote(incident.id) }}
                               />
-                              <button 
+                              <button
+                                type="button"
                                 aria-label="Send note"
                                 onClick={() => handleAddNote(incident.id)}
                                 disabled={!noteText.trim()}

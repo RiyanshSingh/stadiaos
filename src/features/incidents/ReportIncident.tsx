@@ -57,6 +57,8 @@ export function ReportIncident() {
         description
       }, matchId, stadiumId)
       setSubmitSuccess(true)
+    } catch {
+      setValidationError('Failed to report incident. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -100,7 +102,7 @@ export function ReportIncident() {
         )}
 
         {validationError && (
-          <div role="alert" className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-6">
+          <div role="alert" aria-live="assertive" className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-6">
             <p className="text-red-300 text-sm font-medium">{validationError}</p>
           </div>
         )}
@@ -111,8 +113,8 @@ export function ReportIncident() {
         </motion.div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <motion.div variants={itemVariants} className="space-y-3">
-            <label className="text-sm font-medium text-white/70 tracking-tight">Type of Incident</label>
+          <motion.fieldset variants={itemVariants} className="space-y-3 border border-white/10 rounded-3xl p-4">
+            <legend className="text-sm font-medium text-white/70 tracking-tight">Type of Incident</legend>
             <div className="grid grid-cols-2 gap-3">
               {[
                 { id: 'medical', label: 'Medical' },
@@ -124,12 +126,11 @@ export function ReportIncident() {
                 { id: 'suspicious_item', label: 'Suspicious Item' },
                 { id: 'other', label: 'Other' }
               ].map((t) => (
-                <motion.div 
+                <motion.button 
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  type="button"
                   key={t.id}
-                  role="button"
-                  tabIndex={0}
                   onClick={() => setType(t.id)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -137,6 +138,7 @@ export function ReportIncident() {
                       setType(t.id);
                     }
                   }}
+                  aria-pressed={type === t.id}
                   className={cn(
                     "relative p-3.5 rounded-2xl border cursor-pointer text-center transition-all duration-300 overflow-hidden font-medium text-sm tracking-tight",
                     type === t.id 
@@ -145,17 +147,17 @@ export function ReportIncident() {
                   )}
                 >
                   {type === t.id && (
-                    <motion.div 
+                    <motion.span 
                       layoutId="incidentTypeBg" 
                       className="absolute inset-0 bg-white/10" 
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     />
                   )}
                   <span className="relative z-10">{t.label}</span>
-                </motion.div>
+                </motion.button>
               ))}
             </div>
-          </motion.div>
+          </motion.fieldset>
 
           <motion.div variants={itemVariants} className="space-y-3">
             <label htmlFor="incident-location" className="text-sm font-medium text-white/70 tracking-tight">Location</label>

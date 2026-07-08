@@ -258,18 +258,11 @@ export function ProfileView() {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-0 z-[60] flex items-end"
           >
-            <div 
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               aria-label="Close menu overlay"
-              onClick={() => setIsMenuOpen(false)} 
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
-                  e.preventDefault();
-                  setIsMenuOpen(false);
-                }
-              }}
+              onClick={() => setIsMenuOpen(false)}
             />
             <div className="w-full h-[85vh] bg-black border-t border-white/10 rounded-t-3xl relative flex flex-col shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
               <div className="p-4 flex justify-center border-b border-white/5">

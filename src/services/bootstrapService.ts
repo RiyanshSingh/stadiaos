@@ -1,70 +1,87 @@
 import { supabase } from '@/services/supabase';
-import type { Profile, Ticket } from '@/lib/types/domain';
+import type { Profile, Ticket, Match } from '@/lib/types/domain';
 import { requireAuthenticatedUser } from '@/lib/authGuards';
 
-export const bootstrapService = {
-  async loadAppBootstrapData(userId: string) {
-    try {
-      requireAuthenticatedUser();
+type StadiumRow = { name?: string | null };
 
-      // 1. Fetch Profile
+type MatchWithStadiums = Match & {
+  stadiums?: StadiumRow | StadiumRow[] | null;
+};
+
+type TicketRow = Ticket & {
+  matches?: MatchWithStadiums | MatchWithStadiums[] | null;
+};
+
+function normalizeMatchFromTicket(ticketData: TicketRow): Match | null {
+  const matchRow = ticketData.matches;
+  const candidate = Array.isArray(matchRow) ? matchRow[0] : matchRow;
+
+  if (!candidate) {
+    return null;
+  }
+
+  const stadiumName = Array.isArray(candidate.stadiums)
+    ? candidate.stadiums[0]?.name
+    : candidate.stadiums?.name;
+
+  return {
+    ...candidate,
+    title: candidate.title || (stadiumName ? `${stadiumName} Match` : 'Match'),
+    stadium_name: stadiumName
+  };
+}
+
+export const bootstrapService = {
+  async loadAppBootstrapData(userId: string): Promise<{ profile: Profile; ticket: TicketRow | null; match: Match | null }> {
+    try {
+      await requireAuthenticatedUser();
+
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
+        .from<Profile>('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
-        
+
       if (profileError) throw profileError;
       if (!profileData) throw new Error('Profile not found. Re-authentication required.');
 
-      // Strict role enforcement during bootstrap
       if (profileData.role === 'fan') {
-        // Fetch their most recent ticket
-        const { data: ticketData } = await supabase
-          .from('tickets')
+        const { data: ticketData, error: ticketError } = await supabase
+          .from<TicketRow>('tickets')
           .select('*, matches(id, title, match_date, start_time, home_team, away_team, stadiums(name))')
           .eq('user_id', userId)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
-        
-        // Return clear markers for routing layer
+
+        if (ticketError) throw ticketError;
         if (!ticketData) {
           return {
-            profile: profileData as Profile,
+            profile: profileData,
             match: null,
             ticket: null
           };
         }
 
-        let matchData = null;
-        if (ticketData.matches) {
-          const mData = Array.isArray(ticketData.matches) ? ticketData.matches[0] : ticketData.matches;
-          if (mData) {
-            const sData = mData.stadiums;
-            const stadiumName = Array.isArray(sData) ? sData[0]?.name : sData?.name;
-            matchData = { ...mData, title: mData.title || (stadiumName ? stadiumName + ' Match' : 'Match') };
-            matchData.stadium_name = stadiumName;
-          }
-        }
-
         return {
-          profile: profileData as Profile,
-          match: matchData,
-          ticket: ticketData as Ticket
+          profile: profileData,
+          match: normalizeMatchFromTicket(ticketData),
+          ticket: ticketData
         };
-      } else if (profileData.role === 'ops_manager') {
+      }
+
+      if (profileData.role === 'ops_manager') {
         return {
-          profile: profileData as Profile,
+          profile: profileData,
           match: null,
           ticket: null
         };
-      } else {
-         throw new Error(`Unsupported role: ${profileData.role}`);
       }
+
+      throw new Error(`Unsupported role: ${profileData.role}`);
     } catch (error) {
       console.error('App bootstrap failed:', error);
-      throw error; // Throw so caller handles it (e.g. redirecting) instead of silent failure
+      throw error;
     }
   }
 };

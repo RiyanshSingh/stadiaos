@@ -9,15 +9,15 @@ vi.mock('../supabase', () => ({
     order: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue({
-      data: { id: '1', amenity_id: 'a1', match_id: 'm1', crowd_level: 'High' },
+      data: { id: '1', amenity_id: 'a1', match_id: 'm1' },
       error: null
     }),
     then: function(resolve: any) {
       resolve({
         data: [
-          { id: '1', amenity_id: 'a1', match_id: 'm1', crowd_level: 'High' },
-          { id: '2', amenity_id: 'a1', match_id: 'm1', crowd_level: 'Low' }, // old
-          { id: '3', amenity_id: 'a2', match_id: 'm1', crowd_level: 'Medium' }
+          { id: '1', amenity_id: 'a1', match_id: 'm1' },
+          { id: '2', amenity_id: 'a1', match_id: 'm1' }, // old
+          { id: '3', amenity_id: 'a2', match_id: 'm1' }
         ],
         error: null
       });
@@ -30,12 +30,10 @@ describe('queueService', () => {
     const metrics = await queueService.fetchQueueMetrics('m1');
     expect(metrics).toHaveLength(2); // a1 and a2
     expect(metrics[0].amenity_id).toBe('a1');
-    expect(metrics[0].crowd_level).toBe('High');
   });
 
   it('fetches single metric for amenity', async () => {
     const metric = await queueService.fetchQueueMetricForAmenity('m1', 'a1');
     expect(metric?.amenity_id).toBe('a1');
-    expect(metric?.crowd_level).toBe('High');
   });
 });

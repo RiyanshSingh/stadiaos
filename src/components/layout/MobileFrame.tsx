@@ -1,7 +1,8 @@
+import React from 'react';
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export function MobileFrame({ children }: { children: ReactNode }) {
+export const MobileFrame = React.memo(function MobileFrame({ children }: { children: ReactNode }) {
   const location = useLocation();
   
   // Do not apply mobile frame to the Ops Dashboard
@@ -18,4 +19,4 @@ export function MobileFrame({ children }: { children: ReactNode }) {
       </div>
     </div>
   );
-}
+});
