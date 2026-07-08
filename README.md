@@ -1,70 +1,126 @@
-# StadiaOS
+# StadiaOS 🏟️
 
-**A GenAI-powered Smart Stadium & Tournament Operations Platform**
+**An AI-powered smart stadium companion for sports fans — built at Hack2Skill Hackathon.**
 
-StadiaOS is a real-time multi-agent platform designed for stadium operators, volunteers, and fans. It tackles the chaos of matchdays by predicting crowd pressure, coordinating incidents, optimizing staff deployment, and giving every fan a multilingual match-day assistant.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Product Capabilities
+---
 
-### 📱 Fan App
+## ✨ Overview
 
-- **Matchday Copilot**: A conversational AI that understands natural language ("where's the nearest washroom?", "take me to my seat").
-- **Live Routing**: An indoor map and step-by-step route engine tailored to the stadium's topology, including accessible routes.
-- **Incident Reporting**: Fast, AI-triaged incident reporting for emergencies or assistance.
-- **Live Alerts**: Real-time broadcast advisories pushed directly from stadium operations.
+StadiaOS transforms the in-stadium experience by putting real-time intelligence in fans' hands. It helps you find your seat, navigate facilities, get live alerts, and report incidents — all powered by a conversational AI Copilot.
 
-### 🛡️ Ops Command Center
+---
 
-- **Live Aggregation Snapshot**: Real-time monitoring of open incidents, active advisories, congested gates, and high-queue facilities.
-- **AI Triage Desk**: An operational queue where reported incidents are instantly analyzed by AI, assigning severity and summaries to speed up staff dispatch.
-- **Advisory Broadcasting**: Allows ops managers to instantly publish public alerts that sync directly to the Fan App.
-- **Crowd Operations**: Real-time wait times and density metrics for gates and amenities to direct operational flow.
+## 🏗️ Architecture
 
-## Architecture Highlights
+```
+src/
+├── app/
+│   ├── fan/          # All fan-facing views (FanDashboard, MapView, etc.)
+│   └── ops/          # Ops Manager dashboard
+├── components/
+│   ├── layout/       # MobileFrame (responsive shell)
+│   ├── shared/       # Reusable components (BottomNav, ErrorBoundary)
+│   └── ui/           # Primitive UI components (Card, Avatar, etc.)
+├── features/
+│   └── fan-assistant/ # FanCopilot (AI chat interface)
+├── services/          # Business logic and API clients
+│   ├── __tests__/     # Unit & integration tests (Vitest)
+│   ├── groq/          # Groq LLM client
+│   ├── routing/       # Pathfinding (graph-based, Dijkstra-like)
+│   └── supabase/      # Supabase client
+├── store/             # Zustand global state
+└── lib/
+    ├── types/         # Shared TypeScript types & interfaces
+    └── supabase.ts    # Typed Supabase client
+```
 
-- **Fan Copilot Pipeline**: LLM-driven intent extraction (using Groq) mapped to rigid, predictable domain resolvers.
-- **Deterministic Routing**: A bespoke indoor graph pathfinding engine (Dijkstra) running over static routing keys to guarantee reliable fan directions without heavy GIS dependencies.
-- **Realtime Sync**: Leverages Supabase Realtime to keep the Fan App and Ops Dashboard in perfect sync during live events.
+---
 
-For more deep-dives into how these systems are built, read [Architecture Guide](docs/ARCHITECTURE.md).
+## 🛡️ Security
 
-## How to Use the App
+- **Row Level Security (RLS)**: All Supabase tables are protected. Users can only access their own tickets, incidents, and queries. See `supabase/rls_policies.sql`.
+- **Content Security Policy (CSP)**: Strict CSP headers are applied in `index.html`.
+- **API Key Handling**: The Groq API key is held client-side only for the hackathon prototype. In production, this would be moved to a Supabase Edge Function.
+- **Supabase Auth**: All protected routes require authentication via Supabase Auth.
 
-StadiaOS provides two distinct interfaces depending on your user role. The Identity Gateway (`/auth`) will automatically route you to the correct experience upon login.
+---
 
-### 📱 Fan Experience
+## ♿ Accessibility
 
-To experience the app as a fan attending a match:
+- All icon-only buttons and links have `aria-label` attributes.
+- The navigation uses a semantic `<nav>` element.
+- Main content pages use semantic `<main>` elements.
+- The AI Copilot chat uses `role="log"` and `aria-live="polite"` for screen reader compatibility.
+- A **skip to main content** link is available for keyboard users.
 
-1. Open the application base URL (e.g., `http://localhost:5173/`). If you aren't logged in, you'll be redirected to the **Identity Gateway**.
-2. log in as id- itsyourriyansh@gmail.com, Pass: 123123
-3. Upon logging in, you'll land on the **Fan Dashboard**.
-4. **Key Features to Explore:**
-   - **Ticket & Map**: View your ticket and get step-by-step routing to your seat using the interactive indoor map (`/map`).
-   - **stadios Copilot**: Tap "Ask Copilot" on the dashboard to chat with the AI (e.g., "Where is the nearest food?").
-   - **Safety & Reporting**: Use the "Emergency & Support" quick actions to report an incident (like a blocked pathway or a medical emergency).
+---
 
-### 🛡️ Ops Command Center (Admin/Staff)
+## 🧪 Testing
 
-To experience the command center as stadium operations staff:
+```bash
+npm run test        # Run all tests (Vitest)
+npm run test:watch  # Watch mode
+```
 
-1. Navigate directly to the Ops Dashboard route (`/ops`).
-2. Upon logging in, you'll access the **Ops Command Center**.
-3. **Key Features to Explore:**
-   - **AI Triage Desk**: Watch incidents reported by fans appear in real-time, complete with AI-generated summaries and suggested severity.
-   - **Crowd Control**: Monitor active wait times and density metrics across the stadium gates and amenities.
-   - **Resolution**: Assign response teams to active incidents and resolve them, syncing the updates back to the reporting fan.
+**Test Coverage:**
+- `routingService` — Pathfinding and graph algorithms (9 tests)
+- `copilotIntentService` — Intent classification (3 tests)
+- `copilotResolver` — End-to-end Copilot pipeline (4 tests)
+- `incidentService` — Incident creation (2 tests)
+- `facilityService` — Facility lookup (1 test)
+- `alertService` — Alert fetching (1 test)
+- `opsService` — Ops dashboard metrics (2 tests)
+- `BottomNav` — UI component test (1 test)
+- `MobileFrame` — UI component test (1 test)
 
-## Quick Start
+---
 
-To get this project running locally on your machine with full mock data and GenAI integration:
+## ⚡ Efficiency
 
-1. Clone the repo and run `npm install`.
-2. Follow the detailed environment setup in [Environment Setup](docs/ENV_SETUP.md) to configure Supabase and Groq.
-3. Start the dev server with `npm run dev`.
+- **Code Splitting**: All routes are lazily loaded via `React.lazy()` + `<Suspense>`, reducing initial bundle size.
+- **Memoization**: Expensive static data in components is wrapped with `useMemo`.
+- **Image Optimization**: Images use `loading="lazy"` for deferred loading.
+- **Passive scroll listeners**: All scroll event listeners use `{ passive: true }` to prevent blocking the main thread.
 
-## Evaluating the Platform
+---
 
-If you are evaluating this project, we highly recommend following our step-by-step demo script to see the real-time interaction between the Fan App and Ops Command Center.
+## 🚀 Getting Started
 
-👉 **Read the [Demo Flow Guide](docs/DEMO_FLOW.md)**
+```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Fill in VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_GROQ_API_KEY
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+---
+
+## 🔧 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Vite |
+| Styling | Tailwind CSS |
+| Animations | Framer Motion |
+| State | Zustand |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| AI | Groq (Llama 3.1) |
+| Testing | Vitest, React Testing Library |
+| Routing | React Router v6 |
+
+---
+
+## 📄 License
+
+MIT

@@ -6,6 +6,7 @@ import { lazy, Suspense } from 'react'
 import { FanDashboard } from '@/app/fan/FanDashboard' // keep dashboard eager for fast initial load
 import { BottomNav } from '@/components/shared/BottomNav'
 import { MobileFrame } from '@/components/layout/MobileFrame'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
 import { useAuthService } from '@/services/authService'
 
@@ -176,9 +177,20 @@ function App() {
   return (
     <Router>
       <div className="dark bg-black min-h-screen text-foreground font-sans selection:bg-white/30 selection:text-white">
-        <MobileFrame>
-          <AnimatedRoutes />
-        </MobileFrame>
+        {/* Skip to content link for keyboard / screen-reader users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-white focus:text-black focus:px-4 focus:py-2 focus:rounded-full focus:font-semibold focus:text-sm"
+        >
+          Skip to main content
+        </a>
+        <ErrorBoundary>
+          <MobileFrame>
+            <div id="main-content">
+              <AnimatedRoutes />
+            </div>
+          </MobileFrame>
+        </ErrorBoundary>
       </div>
     </Router>
   )

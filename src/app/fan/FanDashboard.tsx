@@ -87,7 +87,7 @@ export function FanDashboard() {
   }), [])
 
   return (
-    <div className="min-h-screen bg-black text-white pb-32 px-6 pt-12 relative overflow-hidden">
+    <main className="min-h-screen bg-black text-white pb-32 px-6 pt-12 relative overflow-hidden">
       
       {/* Background gradients */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-white/[0.03] rounded-full blur-[100px] pointer-events-none" />
@@ -117,13 +117,13 @@ export function FanDashboard() {
             )}
           </Link>
           <div className="flex gap-2">
-            <Link to="/alerts" className="relative p-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              <AlertTriangle className="w-4 h-4 text-white/70" />
-              {activeAlertsCount > 0 && <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)]" />}
+            <Link to="/alerts" aria-label={`Live Alerts${activeAlertsCount > 0 ? ` (${activeAlertsCount} active)` : ''}`} className="relative p-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <AlertTriangle className="w-4 h-4 text-white/70" aria-hidden="true" />
+              {activeAlertsCount > 0 && <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)]" aria-hidden="true" />}
             </Link>
-            <Link to="/notifications" className="relative p-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              <Bell className="w-4 h-4 text-white/70" />
-              {state.unreadNotificationsCount > 0 && <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]" />}
+            <Link to="/notifications" aria-label={`Notifications${state.unreadNotificationsCount > 0 ? ` (${state.unreadNotificationsCount} unread)` : ''}`} className="relative p-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <Bell className="w-4 h-4 text-white/70" aria-hidden="true" />
+              {state.unreadNotificationsCount > 0 && <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]" aria-hidden="true" />}
             </Link>
           </div>
         </motion.header>
@@ -270,7 +270,7 @@ export function FanDashboard() {
         </motion.section>
 
       </motion.div>
-    </div>
+    </main>
   )
 }
 

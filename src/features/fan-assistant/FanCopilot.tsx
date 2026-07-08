@@ -230,7 +230,13 @@ export function FanCopilot() {
       </div>
 
       {/* CHAT THREAD */}
-      <div className="flex-1 overflow-y-auto px-5 pt-[100px] pb-32">
+      <div
+        className="flex-1 overflow-y-auto px-5 pt-[100px] pb-32"
+        role="log"
+        aria-label="Conversation with Copilot"
+        aria-live="polite"
+        aria-relevant="additions"
+      >
         <div className="space-y-6">
           {messages.map((msg) => (
             <motion.div 
@@ -301,13 +307,15 @@ export function FanCopilot() {
       {/* COMPOSER */}
       <div className="fixed bottom-0 left-0 right-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black via-black/95 to-transparent z-40">
         <div className="flex items-end gap-3 p-2 bg-white/[0.03] border border-white/10 rounded-[2rem] backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
-          <button className="w-10 h-10 flex items-center justify-center text-white/40 hover:text-white/80 transition-colors shrink-0">
-            <Paperclip className="w-5 h-5" />
+          <button aria-label="Attach file" className="w-10 h-10 flex items-center justify-center text-white/40 hover:text-white/80 transition-colors shrink-0">
+            <Paperclip className="w-5 h-5" aria-hidden="true" />
           </button>
           <textarea 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Message Copilot..."
+            aria-label="Message Copilot"
+            aria-disabled={isSending}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(input); } }}
             className="flex-1 bg-transparent text-[15px] font-medium text-white placeholder:text-white/30 focus:outline-none resize-none py-3.5 min-h-[48px] max-h-[120px]"
             rows={1}
@@ -317,13 +325,14 @@ export function FanCopilot() {
             <button 
               onClick={() => handleSend(input)} 
               disabled={isSending}
+              aria-label="Send message"
               className="w-10 h-10 shrink-0 bg-white text-black rounded-full flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg disabled:opacity-50"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4" aria-hidden="true" />
             </button>
           ) : (
-            <button className="w-10 h-10 shrink-0 flex items-center justify-center text-white/40 hover:text-white/80 transition-colors">
-              <Mic className="w-5 h-5" />
+            <button aria-label="Voice input" className="w-10 h-10 shrink-0 flex items-center justify-center text-white/40 hover:text-white/80 transition-colors">
+              <Mic className="w-5 h-5" aria-hidden="true" />
             </button>
           )}
         </div>
