@@ -29,10 +29,25 @@ export function ReportIncident() {
   const [severity, setSeverity] = useState('urgent')
   const [contactPref, setContactPref] = useState('in_app')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!description.trim() || isSubmitting || !matchId || !stadiumId || !userId || !role) return
+    setValidationError(null)
+    if (!description.trim()) {
+      setValidationError('Please provide a description of the incident.')
+      return
+    }
+    if (description.trim().length < 10) {
+      setValidationError('Description must be at least 10 characters.')
+      return
+    }
+    if (!zone.trim()) {
+      setValidationError('Please provide a location for the incident.')
+      return
+    }
+    if (isSubmitting || !matchId || !stadiumId || !userId || !role) return
     setIsSubmitting(true)
 
     try {
@@ -41,10 +56,7 @@ export function ReportIncident() {
         zone,
         description
       }, matchId, stadiumId, userId, role)
-      
-      // Simple success alert, then navigate back
-      alert('Incident reported successfully. Help is on the way.')
-      navigate(-1)
+      setSubmitSuccess(true)
     } finally {
       setIsSubmitting(false)
     }
@@ -60,9 +72,10 @@ export function ReportIncident() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate(-1)} 
+          aria-label="Go back"
           className="p-2 -ml-2 hover:bg-white/10 rounded-full transition-colors"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-6 h-6" aria-hidden="true" />
         </motion.button>
         <div>
           <h1 className="text-xl font-medium tracking-tight">Report Incident</h1>
@@ -76,6 +89,22 @@ export function ReportIncident() {
         animate="show"
         className="p-6 relative z-10"
       >
+
+        {/* Inline success state replaces alert() */}
+        {submitSuccess && (
+          <div role="status" aria-live="polite" className="bg-green-500/10 border border-green-500/30 rounded-2xl p-5 mb-6 text-center">
+            <p className="text-green-300 font-semibold text-sm">✓ Incident reported successfully.</p>
+            <p className="text-white/50 text-xs mt-1">Help is on the way. You can track updates in My Reports.</p>
+            <button onClick={() => navigate(-1)} className="mt-4 text-white/70 text-xs underline">Go back</button>
+          </div>
+        )}
+
+        {validationError && (
+          <div role="alert" className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-6">
+            <p className="text-red-300 text-sm font-medium">{validationError}</p>
+          </div>
+        )}
+
         <motion.div variants={itemVariants} className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-8 flex gap-4 items-start text-white">
           <AlertTriangle className="w-5 h-5 shrink-0 text-white/70 mt-0.5" />
           <p className="text-sm font-medium leading-relaxed">For immediate life-threatening emergencies, please call local emergency services directly.</p>
@@ -121,22 +150,27 @@ export function ReportIncident() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="space-y-3">
-            <label className="text-sm font-medium text-white/70 tracking-tight">Location</label>
+            <label htmlFor="incident-location" className="text-sm font-medium text-white/70 tracking-tight">Location</label>
             <Input 
+              id="incident-location"
               value={zone}
               onChange={(e) => setZone(e.target.value)}
               className="glass-input h-14 rounded-2xl px-5 text-base"
               placeholder="e.g. Gate C, Section 102"
+              required
             />
           </motion.div>
 
           <motion.div variants={itemVariants} className="space-y-3">
-            <label className="text-sm font-medium text-white/70 tracking-tight">Description</label>
+            <label htmlFor="incident-description" className="text-sm font-medium text-white/70 tracking-tight">Description <span className="text-white/40 font-normal">(min. 10 characters)</span></label>
             <textarea 
+              id="incident-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full glass-input rounded-2xl p-5 text-base min-h-[120px] resize-none text-white placeholder:text-white/30"
               placeholder="Please describe what happened in detail..."
+              minLength={10}
+              required
             />
           </motion.div>
 
@@ -145,9 +179,11 @@ export function ReportIncident() {
             <label className="text-sm font-medium text-white/70 tracking-tight">Severity</label>
             <div className="grid grid-cols-2 gap-3">
               {['urgent', 'not_urgent'].map((s) => (
-                <div 
+                <button 
+                  type="button"
                   key={s}
                   onClick={() => setSeverity(s)}
+                  aria-pressed={severity === s}
                   className={cn(
                     "p-3.5 rounded-xl border cursor-pointer text-center font-medium text-sm transition-all",
                     severity === s 
@@ -156,7 +192,7 @@ export function ReportIncident() {
                   )}
                 >
                   {s === 'urgent' ? 'Urgent' : 'Not Urgent'}
-                </div>
+                </button>
               ))}
             </div>
           </motion.div>
@@ -166,9 +202,11 @@ export function ReportIncident() {
             <label className="text-sm font-medium text-white/70 tracking-tight">Contact Preference (Optional)</label>
             <div className="grid grid-cols-2 gap-3">
               {['in_app', 'call'].map((c) => (
-                <div 
+                <button 
+                  type="button"
                   key={c}
                   onClick={() => setContactPref(c)}
+                  aria-pressed={contactPref === c}
                   className={cn(
                     "p-3.5 rounded-xl border cursor-pointer text-center font-medium text-sm transition-all",
                     contactPref === c 
@@ -177,7 +215,7 @@ export function ReportIncident() {
                   )}
                 >
                   {c === 'in_app' ? 'In-App Only' : 'Call Me'}
-                </div>
+                </button>
               ))}
             </div>
           </motion.div>

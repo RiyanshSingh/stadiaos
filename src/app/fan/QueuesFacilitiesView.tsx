@@ -63,9 +63,10 @@ export function QueuesFacilitiesView() {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate(-1)}
+              aria-label="Go back"
               className="w-10 h-10 -ml-2 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-colors border border-white/10"
             >
-              <ArrowLeft className="w-5 h-5 text-white/80" />
+              <ArrowLeft className="w-5 h-5 text-white/80" aria-hidden="true" />
             </button>
             <h1 className="text-xl font-bold tracking-tight">Queues & Facilities</h1>
           </div>
@@ -83,9 +84,9 @@ export function QueuesFacilitiesView() {
                 <p className="text-lg font-bold tracking-tight text-white">{smartPick.name}</p>
                 <p className="text-[13px] text-white/50 font-medium mt-1">Shortest wait for {activeFilter}</p>
               </div>
-              <Link to={`/map?dest=${smartPick.name}`}>
+              <Link to={`/map?dest=${smartPick.name}`} aria-label={`Navigate to ${smartPick.name}`}>
                 <div className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center hover:bg-white/90 transition-colors shrink-0">
-                  <Navigation className="w-5 h-5" />
+                  <Navigation className="w-5 h-5" aria-hidden="true" />
                 </div>
               </Link>
             </Card>
@@ -100,6 +101,8 @@ export function QueuesFacilitiesView() {
               <button 
                 key={f.id}
                 onClick={() => setActiveFilter(f.id)}
+                aria-pressed={activeFilter === f.id}
+                aria-label={`Filter by ${f.label}`}
                 className={cn(
                   "flex flex-col items-center justify-center gap-2 h-20 w-20 rounded-2xl border transition-all shrink-0",
                   activeFilter === f.id
@@ -107,7 +110,7 @@ export function QueuesFacilitiesView() {
                     : "bg-black hover:bg-white/5 border-white/10 text-white/40"
                 )}
               >
-                <f.icon className="w-6 h-6" />
+                <f.icon className="w-6 h-6" aria-hidden="true" />
                 <span className="text-[10px] font-bold tracking-widest uppercase">{f.label}</span>
               </button>
             ))}

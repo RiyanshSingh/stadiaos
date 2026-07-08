@@ -18,8 +18,8 @@ export function SettingsView() {
     <div className="min-h-screen bg-black text-white overflow-hidden flex flex-col">
       <header className="px-6 pt-12 pb-4 bg-black/90 backdrop-blur-xl z-20 sticky top-0">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-colors border border-white/10">
-            <ArrowLeft className="w-5 h-5 text-white/80" />
+          <button onClick={() => navigate(-1)} aria-label="Go back" className="w-10 h-10 -ml-2 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-colors border border-white/10">
+            <ArrowLeft className="w-5 h-5 text-white/80" aria-hidden="true" />
           </button>
           <h1 className="text-xl font-bold tracking-tight">Settings</h1>
         </div>
@@ -86,9 +86,10 @@ export function SettingsView() {
               logout()
               navigate('/')
             }}
+            aria-label="Sign out of StadiaOS"
             className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 hover:bg-white/5 transition-colors border border-transparent hover:border-white/5 group"
           >
-            <LogOut className="w-4 h-4 text-white/50 group-hover:text-white/80 transition-colors" />
+            <LogOut className="w-4 h-4 text-white/50 group-hover:text-white/80 transition-colors" aria-hidden="true" />
             <span className="font-bold text-[13px] uppercase tracking-widest text-white/50 group-hover:text-white/90 transition-colors">Sign Out</span>
           </button>
         </section>

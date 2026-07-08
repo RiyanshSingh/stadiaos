@@ -23,6 +23,7 @@ export function TicketSetupView() {
   
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Redirect ops managers
   useEffect(() => {
@@ -33,6 +34,7 @@ export function TicketSetupView() {
     e.preventDefault()
     if (!userId || !selectedStadiumName) return
     setLoading(true)
+    setSubmitError(null)
 
     try {
       // 1. Ensure Stadium Exists
@@ -87,8 +89,9 @@ export function TicketSetupView() {
       
       // Success, route to dashboard
       navigate('/', { replace: true })
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
+      setSubmitError(err?.message || 'Failed to save ticket. Please try again.')
       setLoading(false)
     }
   }
@@ -171,7 +174,7 @@ export function TicketSetupView() {
 
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <button onClick={() => setStep(1)} className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4 hover:text-white transition-colors flex items-center gap-1">
+              <button onClick={() => setStep(1)} aria-label="Go back to stadium selection" className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4 hover:text-white transition-colors flex items-center gap-1">
                 ← Back to Stadiums
               </button>
               
@@ -185,12 +188,19 @@ export function TicketSetupView() {
 
               <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4">Enter Seat Details</h2>
               <form onSubmit={handleSave} className="space-y-4">
+
+                {submitError && (
+                  <div role="alert" className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200/90 text-[13px] font-medium">
+                    {submitError}
+                  </div>
+                )}
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Section</label>
+                    <label htmlFor="seat-section" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Section</label>
                     <div className="relative">
                       <select 
+                        id="seat-section"
                         required
                         value={selectedSection}
                         onChange={(e) => { setSelectedSection(e.target.value); setRow(''); setSeat(''); }}
@@ -217,9 +227,10 @@ export function TicketSetupView() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Row</label>
+                    <label htmlFor="seat-row" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Row</label>
                     <div className="relative">
                       <select 
+                        id="seat-row"
                         required
                         value={row}
                         onChange={(e) => { setRow(e.target.value); setSeat(''); }}
@@ -233,9 +244,10 @@ export function TicketSetupView() {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Seat</label>
+                    <label htmlFor="seat-number" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Seat</label>
                     <div className="relative">
                       <select 
+                        id="seat-number"
                         required
                         value={seat}
                         onChange={(e) => setSeat(e.target.value)}

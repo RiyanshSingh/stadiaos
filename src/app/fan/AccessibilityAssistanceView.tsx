@@ -10,8 +10,8 @@ export function AccessibilityAssistanceView() {
     <div className="min-h-screen bg-black text-white overflow-hidden flex flex-col">
       <header className="px-6 pt-12 pb-4 bg-black/90 backdrop-blur-xl z-20 sticky top-0">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors border border-white/10">
-            <ArrowLeft className="w-5 h-5 text-white/80" />
+          <button onClick={() => navigate(-1)} aria-label="Go back" className="p-2 -ml-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors border border-white/10">
+            <ArrowLeft className="w-5 h-5 text-white/80" aria-hidden="true" />
           </button>
           <h1 className="text-xl font-semibold tracking-tight">Accessibility</h1>
         </div>

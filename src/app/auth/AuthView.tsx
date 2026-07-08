@@ -137,33 +137,38 @@ export function AuthView() {
 
               {isSignUp && (
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Full Name</label>
+                  <label htmlFor="auth-full-name" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Full Name</label>
                   <input
+                    id="auth-full-name"
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full h-12 bg-black/50 border border-white/10 rounded-2xl px-4 text-[15px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                     placeholder="Enter your name"
+                    autoComplete="name"
                   />
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Email Address</label>
+                <label htmlFor="auth-email" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Email Address</label>
                 <input
+                  id="auth-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full h-12 bg-black/50 border border-white/10 rounded-2xl px-4 text-[15px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                   placeholder="fan@example.com"
+                  autoComplete="email"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Password</label>
+                <label htmlFor="auth-password" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Password</label>
                 <input
+                  id="auth-password"
                   type="password"
                   required
                   minLength={6}
@@ -171,6 +176,7 @@ export function AuthView() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full h-12 bg-black/50 border border-white/10 rounded-2xl px-4 text-[15px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                   placeholder="••••••••"
+                  autoComplete={isSignUp ? 'new-password' : 'current-password'}
                 />
               </div>
 

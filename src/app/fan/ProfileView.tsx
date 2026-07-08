@@ -37,14 +37,17 @@ export function ProfileView() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Link to="/profile/info" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
-              <User className="w-5 h-5 text-white/50 hover:text-white/80 transition-colors" />
+            <Link to="/profile/info" aria-label="Edit profile info" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <User className="w-5 h-5 text-white/50 hover:text-white/80 transition-colors" aria-hidden="true" />
             </Link>
             <button 
               onClick={() => setIsMenuOpen(true)}
+              aria-label="Open profile menu"
+              aria-expanded={isMenuOpen}
+              aria-haspopup="true"
               className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-colors border border-white/10"
             >
-              <Menu className="w-5 h-5 text-white/80" />
+              <Menu className="w-5 h-5 text-white/80" aria-hidden="true" />
             </button>
           </div>
         </div>

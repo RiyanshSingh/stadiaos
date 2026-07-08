@@ -164,8 +164,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (!channel) {
         supabase
           .channel('appstore_incidents_channel')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'incidents' }, (payload) => {
-            console.log('Realtime incident update:', payload);
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'incidents' }, () => {
             // For simplicity, just refetch all active incidents on any change
             supabase
               .from('incidents')

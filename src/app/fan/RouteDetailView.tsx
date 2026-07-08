@@ -76,18 +76,26 @@ export function RouteDetailView() {
       <header className="px-6 pt-12 pb-4 bg-black/90 backdrop-blur-xl z-20 sticky top-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors border border-white/10">
-              <ArrowLeft className="w-5 h-5 text-white/80" />
+            <button
+              onClick={() => navigate(-1)}
+              aria-label="Go back"
+              className="p-2 -ml-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors border border-white/10"
+            >
+              <ArrowLeft className="w-5 h-5 text-white/80" aria-hidden="true" />
             </button>
             <h1 className="text-xl font-semibold tracking-tight">Route Details</h1>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase tracking-wider font-bold text-white/50">Accessible</span>
+            <span id="accessible-route-label" className="text-[10px] uppercase tracking-wider font-bold text-white/50">Accessible</span>
             <button
+              role="switch"
+              aria-checked={routeMode === 'accessible'}
+              aria-labelledby="accessible-route-label"
               onClick={handleToggleAccessible}
               className={cn("w-8 h-4 rounded-full relative border border-white/10 transition-colors", routeMode === 'accessible' ? 'bg-blue-500' : 'bg-white/20')}
             >
-              <div className={cn("w-3 h-3 bg-white rounded-full absolute top-[1px] transition-all", routeMode === 'accessible' ? 'left-[18px]' : 'left-[1px]')} />
+              <span className="sr-only">{routeMode === 'accessible' ? 'Accessible routing on' : 'Accessible routing off'}</span>
+              <div className={cn("w-3 h-3 bg-white rounded-full absolute top-[1px] transition-all", routeMode === 'accessible' ? 'left-[18px]' : 'left-[1px]')} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -96,8 +104,8 @@ export function RouteDetailView() {
       <div className="flex-1 overflow-y-auto px-4 pt-6 pb-32 space-y-6">
 
         {loading && (
-          <div className="flex items-center justify-center py-16">
-            <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          <div role="status" aria-label="Loading route" className="flex items-center justify-center py-16">
+            <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" aria-hidden="true" />
           </div>
         )}
 

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/services/supabase';
 import { triageService } from '@/services/triageService';
+import { useAuthService } from '@/services/authService';
 import type { Incident, IncidentSeverity, IncidentStatus } from '@/lib/types/domain';
 
 interface IncidentState {
@@ -45,12 +46,13 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
     set((state) => ({
       incidents: state.incidents.map(inc => inc.id === id ? { ...inc, status: 'resolved' as IncidentStatus } : inc)
     }));
+    const sessionUserId = useAuthService.getState().userId;
     await supabase.from('incidents').update({ status: 'resolved' }).eq('id', id);
     await supabase.from('incident_updates').insert([{
       incident_id: id,
       new_status: 'resolved',
       note: 'Incident resolved by operations.',
-      updated_by: '33333333-3333-3333-3333-333333333333' // Mock ops manager
+      updated_by: sessionUserId
     }]);
   },
 
@@ -58,13 +60,14 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
     set((state) => ({
       incidents: state.incidents.map(inc => inc.id === id ? { ...inc, status: newStatus } : inc)
     }));
+    const sessionUserId = useAuthService.getState().userId;
     await supabase.from('incidents').update({ status: newStatus }).eq('id', id);
     await supabase.from('incident_updates').insert([{
       incident_id: id,
       old_status: oldStatus,
       new_status: newStatus,
       note: note || `Status changed to ${newStatus}`,
-      updated_by: '33333333-3333-3333-3333-333333333333'
+      updated_by: sessionUserId
     }]);
   },
 
@@ -72,19 +75,21 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
     set((state) => ({
       incidents: state.incidents.map(inc => inc.id === id ? { ...inc, assigned_team: team as any } : inc)
     }));
+    const sessionUserId = useAuthService.getState().userId;
     await supabase.from('incidents').update({ assigned_team: team }).eq('id', id);
     await supabase.from('incident_updates').insert([{
       incident_id: id,
       note: `Assigned to team: ${team}`,
-      updated_by: '33333333-3333-3333-3333-333333333333'
+      updated_by: sessionUserId
     }]);
   },
 
   addIncidentNote: async (id, note) => {
+    const sessionUserId = useAuthService.getState().userId;
     await supabase.from('incident_updates').insert([{
       incident_id: id,
       note: note,
-      updated_by: '33333333-3333-3333-3333-333333333333'
+      updated_by: sessionUserId
     }]);
     // Optionally fetch to reflect in UI if we track notes in the ops list
   },

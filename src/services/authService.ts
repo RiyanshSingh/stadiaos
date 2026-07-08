@@ -105,9 +105,12 @@ export const useAuthService = create<AuthState>()(
           role: null,
           matchId: null,
           stadiumId: null,
+          opsStadiumId: null,
           email: null,
           fullName: null
         });
+        // Clear persisted auth from localStorage to prevent stale session rehydration
+        try { localStorage.removeItem('stadiaos-auth-storage'); } catch (_) {}
       }
     }),
     {
