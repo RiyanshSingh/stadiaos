@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { groq } from '@/services/groq';
 
+// SECURITY NOTE: In a production environment, the Groq API key and chat completions 
+// should be moved to a backend service or Supabase Edge Function to prevent exposing 
+// the secret to the client. It is kept here strictly for hackathon prototype purposes.
+
 export type Message = {
   id: string;
   role: 'user' | 'assistant';

@@ -46,13 +46,14 @@ export function BottomNav() {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="fixed bottom-6 left-1/2 z-50 w-full max-w-sm px-6"
     >
-      <div className="glass-nav relative flex items-center justify-between p-2 h-[72px]">
+      <nav aria-label="Main Navigation" className="glass-nav relative flex items-center justify-between p-2 h-[72px]">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           return (
             <Link
               key={item.path}
               to={item.path}
+              aria-label={item.label}
               className={cn(
                 "relative flex-1 flex flex-col items-center justify-center gap-1 transition-colors h-full z-10",
                 isActive ? "text-white" : "text-white/40 hover:text-white/80"
@@ -77,7 +78,7 @@ export function BottomNav() {
             </Link>
           )
         })}
-      </div>
+      </nav>
     </motion.div>
   )
 }

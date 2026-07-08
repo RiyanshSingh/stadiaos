@@ -2,33 +2,35 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Outlet, Navigate }
 import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Variants } from 'framer-motion'
-import { FanDashboard } from '@/app/fan/FanDashboard'
-import { FanCopilot } from '@/features/fan-assistant/FanCopilot'
-import { OpsDashboard } from '@/app/ops/OpsDashboard'
-import { ReportIncident } from '@/features/incidents/ReportIncident'
+import { lazy, Suspense } from 'react'
+import { FanDashboard } from '@/app/fan/FanDashboard' // keep dashboard eager for fast initial load
 import { BottomNav } from '@/components/shared/BottomNav'
 import { MobileFrame } from '@/components/layout/MobileFrame'
 import { useAppStore } from '@/store/useAppStore'
 import { useAuthService } from '@/services/authService'
-import { MapView } from '@/app/fan/MapView'
-import { ProfileView } from '@/app/fan/ProfileView'
-import { ProfileInfoView } from '@/app/fan/ProfileInfoView'
-import { QueuesFacilitiesView } from '@/app/fan/QueuesFacilitiesView'
-import { LiveAlertsView } from '@/app/fan/LiveAlertsView'
-import { NotificationsView } from '@/app/fan/NotificationsView'
-import { MyReportsView } from '@/app/fan/MyReportsView'
-import { SearchResultsView } from '@/app/fan/SearchResultsView'
-import { MatchCenterView } from '@/app/fan/MatchCenterView'
-import { TicketSeatView } from '@/app/fan/TicketSeatView'
-import { RouteDetailView } from '@/app/fan/RouteDetailView'
-import { FacilityDetailView } from '@/app/fan/FacilityDetailView'
-import { VenueInfoView } from '@/app/fan/VenueInfoView'
-import { AccessibilityAssistanceView } from '@/app/fan/AccessibilityAssistanceView'
-import { SavedRecentView } from '@/app/fan/SavedRecentView'
-import { SettingsView } from '@/app/fan/SettingsView'
-import { AuthView } from '@/app/auth/AuthView'
-import { OnboardingView } from '@/app/auth/OnboardingView'
-import { TicketSetupView } from '@/app/fan/TicketSetupView'
+
+const FanCopilot = lazy(() => import('@/features/fan-assistant/FanCopilot').then(m => ({ default: m.FanCopilot })))
+const OpsDashboard = lazy(() => import('@/app/ops/OpsDashboard').then(m => ({ default: m.OpsDashboard })))
+const ReportIncident = lazy(() => import('@/features/incidents/ReportIncident').then(m => ({ default: m.ReportIncident })))
+const MapView = lazy(() => import('@/app/fan/MapView').then(m => ({ default: m.MapView })))
+const ProfileView = lazy(() => import('@/app/fan/ProfileView').then(m => ({ default: m.ProfileView })))
+const ProfileInfoView = lazy(() => import('@/app/fan/ProfileInfoView').then(m => ({ default: m.ProfileInfoView })))
+const QueuesFacilitiesView = lazy(() => import('@/app/fan/QueuesFacilitiesView').then(m => ({ default: m.QueuesFacilitiesView })))
+const LiveAlertsView = lazy(() => import('@/app/fan/LiveAlertsView').then(m => ({ default: m.LiveAlertsView })))
+const NotificationsView = lazy(() => import('@/app/fan/NotificationsView').then(m => ({ default: m.NotificationsView })))
+const MyReportsView = lazy(() => import('@/app/fan/MyReportsView').then(m => ({ default: m.MyReportsView })))
+const SearchResultsView = lazy(() => import('@/app/fan/SearchResultsView').then(m => ({ default: m.SearchResultsView })))
+const MatchCenterView = lazy(() => import('@/app/fan/MatchCenterView').then(m => ({ default: m.MatchCenterView })))
+const TicketSeatView = lazy(() => import('@/app/fan/TicketSeatView').then(m => ({ default: m.TicketSeatView })))
+const RouteDetailView = lazy(() => import('@/app/fan/RouteDetailView').then(m => ({ default: m.RouteDetailView })))
+const FacilityDetailView = lazy(() => import('@/app/fan/FacilityDetailView').then(m => ({ default: m.FacilityDetailView })))
+const VenueInfoView = lazy(() => import('@/app/fan/VenueInfoView').then(m => ({ default: m.VenueInfoView })))
+const AccessibilityAssistanceView = lazy(() => import('@/app/fan/AccessibilityAssistanceView').then(m => ({ default: m.AccessibilityAssistanceView })))
+const SavedRecentView = lazy(() => import('@/app/fan/SavedRecentView').then(m => ({ default: m.SavedRecentView })))
+const SettingsView = lazy(() => import('@/app/fan/SettingsView').then(m => ({ default: m.SettingsView })))
+const AuthView = lazy(() => import('@/app/auth/AuthView').then(m => ({ default: m.AuthView })))
+const OnboardingView = lazy(() => import('@/app/auth/OnboardingView').then(m => ({ default: m.OnboardingView })))
+const TicketSetupView = lazy(() => import('@/app/fan/TicketSetupView').then(m => ({ default: m.TicketSetupView })))
 
 const pageVariants: Variants = {
   initial: { opacity: 0, y: 10 },
@@ -99,7 +101,8 @@ function AnimatedRoutes() {
   
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-pulse w-8 h-8 rounded-full bg-white/20" /></div>}>
+        <Routes location={location} key={location.pathname}>
         {/* Public Access Routes */}
         <Route path="/onboarding" element={<OnboardingView />} />
         <Route path="/auth" element={<AuthView />} />
@@ -139,7 +142,8 @@ function AnimatedRoutes() {
         
         {/* Catch-all to redirect invalid routes (like the old /setup) to the dashboard */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   )
 }
