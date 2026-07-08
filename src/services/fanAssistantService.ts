@@ -38,7 +38,8 @@ export const useFanAssistantService = create<FanAssistantState>((set, get) => ({
       try {
         const state = get();
         // Dynamic import to avoid circular dependency if any, but since we are inside a function, direct require/import works, or just get from useAppStore
-        const appStore = require('@/store/useAppStore').useAppStore.getState();
+        const { useAppStore } = await import('@/store/useAppStore');
+        const appStore = useAppStore.getState();
         const { profile, ticket, match } = appStore;
         const userName = profile?.full_name || 'Fan';
         const ticketInfo = ticket ? `Section ${ticket.seat_section}, Row ${ticket.seat_row}, Seat ${ticket.seat_number}` : 'No active ticket';

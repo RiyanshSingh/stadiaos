@@ -30,9 +30,20 @@ const MOCK_DB_NODES = [
   { id: 'uuid-med',      name: 'Medical Station',  level: '1', is_accessible: true,  metadata: { routing_key: 'medical_station',  x: '82%', y: '56%' } },
 ];
 
+const MOCK_DB_ROUTES = [
+  { fromKey: 'section_214', toKey: 'north_concourse', distanceMeters: 20, is_accessible: true, type: 'walk' },
+  { fromKey: 'north_concourse', toKey: 'section_214', distanceMeters: 20, is_accessible: true, type: 'walk' },
+  { fromKey: 'north_concourse', toKey: 'gate_a', distanceMeters: 50, is_accessible: true, type: 'walk' },
+  { fromKey: 'gate_a', toKey: 'north_concourse', distanceMeters: 50, is_accessible: true, type: 'walk' },
+  { fromKey: 'north_concourse', toKey: 'washroom_north', distanceMeters: 10, is_accessible: true, type: 'walk' },
+  { fromKey: 'washroom_north', toKey: 'north_concourse', distanceMeters: 10, is_accessible: true, type: 'walk' },
+  { fromKey: 'gate_a', toKey: 'section_330', distanceMeters: 30, is_accessible: false, type: 'stairs' },
+  { fromKey: 'section_330', toKey: 'gate_a', distanceMeters: 30, is_accessible: false, type: 'stairs' },
+];
+
 describe('venueGraph', () => {
   it('builds a graph with the expected number of nodes from seeded routing keys', () => {
-    const graph = buildVenueGraph(MOCK_DB_NODES);
+    const graph = buildVenueGraph(MOCK_DB_NODES, MOCK_DB_ROUTES);
     // We have 14 mock nodes above, but the graph only includes ones with routing_key
     expect(graph.nodes.size).toBe(14);
     expect(graph.nodes.has(ROUTING_KEYS.SECTION_214)).toBe(true);
@@ -43,7 +54,7 @@ describe('venueGraph', () => {
     const graph = buildVenueGraph([
       ...MOCK_DB_NODES,
       { id: 'uuid-no-key', name: 'Mystery Zone', level: '1', is_accessible: true, metadata: {} }
-    ]);
+    ], MOCK_DB_ROUTES);
     // Node count stays at 14 — the unkeyed one is excluded
     expect(graph.nodes.size).toBe(14);
   });
@@ -53,7 +64,7 @@ describe('routingService', () => {
   let graph: ReturnType<typeof buildVenueGraph>;
   
   beforeEach(() => {
-    graph = buildVenueGraph(MOCK_DB_NODES);
+    graph = buildVenueGraph(MOCK_DB_NODES, MOCK_DB_ROUTES);
   });
 
   it('computes a valid route from Section 214 to Gate A (standard mode)', () => {
@@ -125,7 +136,7 @@ describe('nodeResolver', () => {
   let graph: ReturnType<typeof buildVenueGraph>;
   
   beforeEach(() => {
-    graph = buildVenueGraph(MOCK_DB_NODES);
+    graph = buildVenueGraph(MOCK_DB_NODES, MOCK_DB_ROUTES);
   });
 
   it('resolves ticket_seat strategy to section_214 from mocked ticket', () => {
