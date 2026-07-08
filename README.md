@@ -40,8 +40,7 @@ To evaluate StadiaOS end-to-end, follow these flows:
 
 ### The Ops Flow
 1. **Login**: Navigate to `/opsauth` and log in as an Operations Manager.
-   - **Email**: `admin@gmail.com`
-   - **Password**: `123123`
+   *(Use the credentials configured during the database seeding step).*
 2. **Command Center**: View real-time crowd congestion metrics.
 3. **Action**: View incoming incident reports in the Triage Desk. Change their status to 'In Progress'. 
 4. **Publish Advisory**: Use the Alert Composer to publish a stadium-wide alert (e.g., "Gate C is congested").
