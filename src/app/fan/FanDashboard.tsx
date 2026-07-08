@@ -25,7 +25,8 @@ const itemVariants: Variants = {
 }
 
 export function FanDashboard() {
-  const { match, ticket } = useAppStore()
+  const match = useAppStore(s => s.match)
+  const ticket = useAppStore(s => s.ticket)
   const [recommendations, setRecommendations] = useState<AiRecommendation[]>([])
   const [_gateStatus, setGateStatus] = useState<GateStatus[]>([])
   const [activeAlertsCount, setActiveAlertsCount] = useState(0)

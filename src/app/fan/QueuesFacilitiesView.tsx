@@ -8,7 +8,7 @@ import { useAppStore } from '@/store/useAppStore'
 
 export function QueuesFacilitiesView() {
   const navigate = useNavigate()
-  const { match } = useAppStore()
+  const match = useAppStore(s => s.match)
   
   const [activeFilter, setActiveFilter] = useState('food')
   const [activeSort, setActiveSort] = useState('nearest')

@@ -83,4 +83,24 @@ describe('incidentService', () => {
       note: 'Assigned to team: medical'
     })]);
   });
+
+  it('adds an incident note', async () => {
+    // 1. Mock insert for notes
+    const mockInsert = vi.fn().mockResolvedValue({ error: null });
+    
+    (supabase.from as any).mockImplementation((table: string) => {
+      if (table === 'incident_updates') {
+        return { insert: mockInsert };
+      }
+      return {};
+    });
+
+    await useIncidentService.getState().addIncidentNote('inc-1', 'Test Note');
+
+    expect(supabase.from).toHaveBeenCalledWith('incident_updates');
+    expect(mockInsert).toHaveBeenCalledWith([expect.objectContaining({
+      incident_id: 'inc-1',
+      note: 'Test Note'
+    })]);
+  });
 });

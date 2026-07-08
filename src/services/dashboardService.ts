@@ -1,6 +1,7 @@
 import { supabase } from '@/services/supabase';
 import { groq } from '@/services/groq';
-import type { AiRecommendation } from '@/lib/types/domain';
+import type { AiRecommendation, QueueMetric } from '@/lib/types/domain';
+import { parseGroqRecommendations } from '@/lib/formatters';
 
 export interface GateStatus {
   gate: string;
@@ -56,17 +57,7 @@ export const dashboardService = {
         response_format: { type: 'json_object' }
       });
       
-      const parsed = JSON.parse(completion.choices[0]?.message?.content || '{"recommendations":[]}');
-      const recs = parsed.recommendations || parsed;
-      const aiRecs = (Array.isArray(recs) ? recs : []).map((r: any, idx: number) => ({
-        id: `gen-${idx}`,
-        match_id: matchId,
-        stadium_id: '11111111-1111-1111-1111-111111111111',
-        recommendation_type: r.recommendation_type || 'general',
-        title: r.title || 'Tip',
-        content: r.content || 'Enjoy the match!',
-        created_at: new Date().toISOString()
-      }));
+      const aiRecs = parseGroqRecommendations(completion.choices[0]?.message?.content || '', matchId);
 
       // Insert into DB so we don't generate next time
       const inserts = aiRecs.map(({id: _id, ...rest}) => rest); // remove temp ID for insert
@@ -90,8 +81,8 @@ export const dashboardService = {
       .select('estimated_wait_minutes, amenities(name, amenity_type)')
       .eq('match_id', matchId);
 
-    let shortestFoodWait: any = null;
-    let shortestWashroomWait: any = null;
+    let shortestFoodWait: Partial<QueueMetric> & { amenities: { name: string, amenity_type: string } } | null = null;
+    let shortestWashroomWait: Partial<QueueMetric> & { amenities: { name: string, amenity_type: string } } | null = null;
 
     if (queueData) {
       const foods = queueData.filter((q: any) => q.amenities?.amenity_type === 'food');

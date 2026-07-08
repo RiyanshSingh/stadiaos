@@ -14,7 +14,7 @@ import { requireFanSession } from '@/lib/authGuards'
 export function TicketSetupView() {
   const navigate = useNavigate()
   const { userId, role } = useAuthService()
-  const { loadBootstrap } = useAppStore()
+  const loadBootstrap = useAppStore(s => s.loadBootstrap)
   
   const [selectedStadiumName, setSelectedStadiumName] = useState('')
   const [selectedSection, setSelectedSection] = useState('')

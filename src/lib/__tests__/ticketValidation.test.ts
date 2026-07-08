@@ -36,4 +36,12 @@ describe('ticketValidation', () => {
     expect(() => validateTicketData('Luzhniki Stadium', 'N101', 'A', 'abc'))
       .toThrow('Invalid seat number: abc. Must be a positive integer.');
   });
+
+  it('fails validation on negative seat numbers', () => {
+    expect(() => validateTicketData('Wembley Stadium', 'N101', 'A', '-5')).toThrow('Invalid seat number');
+  });
+
+  it('fails validation on empty inputs', () => {
+    expect(() => validateTicketData('Wembley Stadium', '', '', '')).toThrow('Invalid section');
+  });
 });

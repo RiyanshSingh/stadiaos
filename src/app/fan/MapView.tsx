@@ -23,7 +23,8 @@ type LiveChip = 'crowd' | 'queue' | 'incidents' | 'alerts'
 export function MapView() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { match, ticket } = useAppStore()
+  const match = useAppStore(s => s.match)
+  const ticket = useAppStore(s => s.ticket)
   
   // State Machine
   const [mode, setMode] = useState<Mode>('explore')

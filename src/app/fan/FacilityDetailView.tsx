@@ -8,7 +8,7 @@ import { useAppStore } from '@/store/useAppStore'
 export function FacilityDetailView() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const { match } = useAppStore()
+  const match = useAppStore(s => s.match)
   const [facility, setFacility] = useState<FacilityViewModel | null>(null)
   const [loading, setLoading] = useState(true)
 

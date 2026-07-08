@@ -6,7 +6,8 @@ import { cn } from '@/lib/utils'
 
 export function TicketSeatView() {
   const navigate = useNavigate()
-  const { ticket, match } = useAppStore()
+  const ticket = useAppStore(s => s.ticket)
+  const match = useAppStore(s => s.match)
 
   // Graceful empty state handling
   const hasTicket = !!ticket;

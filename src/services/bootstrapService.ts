@@ -38,11 +38,14 @@ export const bootstrapService = {
         }
 
         let matchData = null;
-        const { data: mData } = await supabase.from('matches').select('*').eq('id', ticketData.match_id).single();
-        if (mData) {
-          const { data: sData } = await supabase.from('stadiums').select('name').eq('id', mData.stadium_id).single();
-          matchData = { ...mData, title: mData.title || (sData ? sData.name + ' Match' : 'Match') };
-          matchData.stadium_name = sData?.name;
+        if (ticketData.matches) {
+          const mData = Array.isArray(ticketData.matches) ? ticketData.matches[0] : ticketData.matches;
+          if (mData) {
+            const sData = mData.stadiums;
+            const stadiumName = Array.isArray(sData) ? sData[0]?.name : sData?.name;
+            matchData = { ...mData, title: mData.title || (stadiumName ? stadiumName + ' Match' : 'Match') };
+            matchData.stadium_name = stadiumName;
+          }
         }
 
         return {

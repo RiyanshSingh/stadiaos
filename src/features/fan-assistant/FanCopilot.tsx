@@ -17,7 +17,9 @@ export function FanCopilot() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [input, setInput] = useState('')
   
-  const { match, ticket, profile } = useAppStore()
+  const match = useAppStore(s => s.match)
+  const ticket = useAppStore(s => s.ticket)
+  const profile = useAppStore(s => s.profile)
   const { reportIncident } = useIncidentService()
 
   const [messages, setMessages] = useState<CopilotMessage[]>([

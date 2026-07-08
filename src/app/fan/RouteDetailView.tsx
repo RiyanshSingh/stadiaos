@@ -12,7 +12,8 @@ export function RouteDetailView() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const [searchParams] = useSearchParams()
-  const { match, ticket } = useAppStore()
+  const match = useAppStore(s => s.match)
+  const ticket = useAppStore(s => s.ticket)
 
   const destLabel = searchParams.get('dest') ?? id ?? 'Destination'
   const initialMode = (searchParams.get('mode') as RouteMode) ?? 'standard'

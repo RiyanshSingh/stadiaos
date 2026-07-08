@@ -9,7 +9,7 @@ import { useAuthService } from '@/services/authService'
 
 export function ProfileInfoView() {
   const navigate = useNavigate()
-  const { profile } = useAppStore()
+  const profile = useAppStore(s => s.profile)
   const { email } = useAuthService()
   
   const [fullName, setFullName] = useState(profile?.full_name || '')

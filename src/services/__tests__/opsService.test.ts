@@ -109,4 +109,24 @@ describe('opsService', () => {
       }]);
     });
   });
+
+  it('publishes a public advisory successfully', async () => {
+    // 1. Mock insert
+    (supabase.from as any).mockReturnValueOnce({
+      insert: vi.fn().mockResolvedValue({ error: null })
+    });
+
+    await expect(opsService.publishPublicAdvisory('match-1', 'stadium-1', 'Test Title', 'Test Content'))
+      .resolves.not.toThrow();
+  });
+
+  it('throws error when public advisory publishing fails', async () => {
+    // 1. Mock insert failure
+    (supabase.from as any).mockReturnValueOnce({
+      insert: vi.fn().mockResolvedValue({ error: new Error('Insert failed') })
+    });
+
+    await expect(opsService.publishPublicAdvisory('match-1', 'stadium-1', 'Test Title', 'Test Content'))
+      .rejects.toThrow('Insert failed');
+  });
 });

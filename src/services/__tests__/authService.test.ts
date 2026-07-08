@@ -21,7 +21,9 @@ vi.mock('@/services/supabase', () => ({
   },
 }));
 
+import { supabase } from '@/services/supabase';
 import { useAuthService } from '@/services/authService';
+import { useAppStore } from '@/store/useAppStore';
 
 describe('authService', () => {
   beforeEach(() => {
@@ -68,5 +70,20 @@ describe('authService', () => {
   it('setOpsMatchContext can be cleared to null', () => {
     useAuthService.getState().setOpsMatchContext(null);
     expect(useAuthService.getState().matchId).toBeNull();
+  });
+
+  describe('logout', () => {
+    it('clears auth store and signs out from Supabase', async () => {
+      useAuthService.setState({ userId: '123', email: 'test@example.com', role: 'fan', stadiumId: 's1', initialized: true });
+      useAppStore.setState({ initialized: true }); // Assume it's initialized
+
+      await useAuthService.getState().logout();
+
+      const authState = useAuthService.getState();
+      expect(authState.userId).toBeNull();
+      expect(authState.email).toBeNull();
+
+      expect(supabase.auth.signOut).toHaveBeenCalled();
+    });
   });
 });

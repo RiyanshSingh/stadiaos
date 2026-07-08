@@ -7,7 +7,7 @@ import { useAppStore } from '@/store/useAppStore'
 
 export function LiveAlertsView() {
   const navigate = useNavigate()
-  const { match } = useAppStore()
+  const match = useAppStore(s => s.match)
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
 

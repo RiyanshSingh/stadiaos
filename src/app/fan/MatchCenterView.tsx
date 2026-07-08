@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 
 export function MatchCenterView() {
   const navigate = useNavigate()
-  const { match } = useAppStore()
+  const match = useAppStore(s => s.match)
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
 

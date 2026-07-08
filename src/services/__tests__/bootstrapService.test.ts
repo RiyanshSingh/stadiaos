@@ -72,5 +72,37 @@ describe('bootstrapService', () => {
     expect(result?.ticket).toBeNull();
     expect(result?.match).toBeNull();
   });
+
+  it('hydrates match data from joined ticket.matches correctly', async () => {
+    (supabase.from as any).mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn()
+        // profile
+        .mockResolvedValueOnce({
+          data: { id: 'u1', role: 'fan' },
+          error: null
+        })
+        // ticket
+        .mockResolvedValueOnce({
+          data: { 
+            id: 't1', 
+            match_id: 'm1',
+            matches: {
+              id: 'm1',
+              title: null,
+              stadiums: { name: 'Wembley' }
+            }
+          },
+          error: null
+        })
+    });
+
+    const data = await bootstrapService.loadAppBootstrapData('u1');
+    expect(data.match?.title).toBe('Wembley Match');
+    expect(data.match?.stadium_name).toBe('Wembley');
+  });
 });
 
