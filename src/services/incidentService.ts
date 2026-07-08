@@ -58,7 +58,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
     await requireOpsSession();
 
     const { data, error } = await supabase
-      .from<Incident>('incidents')
+      .from('incidents')
       .select('*')
       .eq('match_id', matchId)
       .neq('status', 'resolved')
@@ -79,8 +79,8 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
       )
     }));
 
-    await supabase.from<Incident>('incidents').update({ status: 'resolved' }).eq('id', id);
-    await supabase.from<IncidentUpdate>('incident_updates').insert([
+    await supabase.from('incidents').update({ status: 'resolved' }).eq('id', id);
+    await supabase.from('incident_updates').insert([
       {
         incident_id: id,
         new_status: 'resolved',
@@ -99,8 +99,8 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
       )
     }));
 
-    await supabase.from<Incident>('incidents').update({ status: newStatus }).eq('id', id);
-    await supabase.from<IncidentUpdate>('incident_updates').insert([
+    await supabase.from('incidents').update({ status: newStatus }).eq('id', id);
+    await supabase.from('incident_updates').insert([
       {
         incident_id: id,
         old_status: oldStatus,
@@ -120,8 +120,8 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
       )
     }));
 
-    await supabase.from<Incident>('incidents').update({ assigned_team: team }).eq('id', id);
-    await supabase.from<IncidentUpdate>('incident_updates').insert([
+    await supabase.from('incidents').update({ assigned_team: team }).eq('id', id);
+    await supabase.from('incident_updates').insert([
       {
         incident_id: id,
         note: `Assigned to team: ${team}`,
@@ -133,7 +133,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
   addIncidentNote: async (id, note) => {
     const sessionUserId = await requireOpsSession();
 
-    const { error } = await supabase.from<IncidentUpdate>('incident_updates').insert([
+    const { error } = await supabase.from('incident_updates').insert([
       {
         incident_id: id,
         note,
@@ -165,7 +165,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
     await requireFanSession();
 
     const { data, error } = await supabase
-      .from<IncidentWithUpdates>('incidents')
+      .from('incidents')
       .select('*, updates:incident_updates(*)')
       .eq('reported_by', userId)
       .order('created_at', { ascending: false });
@@ -228,7 +228,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
       };
 
       const { data: newIncident, error } = await supabase
-        .from<Incident>('incidents')
+        .from('incidents')
         .insert([insertPayload])
         .select()
         .single();
@@ -238,7 +238,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
         throw error || new Error('Incident report failed.');
       }
 
-      const { error: updateError } = await supabase.from<IncidentUpdate>('incident_updates').insert([
+      const { error: updateError } = await supabase.from('incident_updates').insert([
         {
           incident_id: newIncident.id,
           new_status: 'reported',

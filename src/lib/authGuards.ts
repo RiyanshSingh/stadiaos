@@ -20,7 +20,7 @@ export const requireAuthenticatedUser = async (): Promise<string> => {
 
 const requireRole = async (userId: string, requiredRole: RoleCheck): Promise<void> => {
   const { data: profile, error } = await supabase
-    .from<ProfileRow>('profiles')
+    .from('profiles')
     .select('role, disabled')
     .eq('id', userId)
     .single();

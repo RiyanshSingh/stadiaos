@@ -188,8 +188,8 @@ describe('dashboardService', () => {
       const result = await dashboardService.getLiveStatusCards('test-match-id');
       
       expect(result.gate).toEqual({ gate: 'Gate A', crowd: 'Low', waitTime: 5 });
-      expect(result.food?.amenities.name).toBe('Burger');
-      expect(result.washroom?.amenities.name).toBe('Restroom');
+      expect(result.food?.amenities?.name).toBe('Burger');
+      expect(result.washroom?.amenities?.name).toBe('Restroom');
     });
 
     it('returns null cards when matchId is missing', async () => {

@@ -44,7 +44,7 @@ export const facilityService = {
     const stadiumQueryId = stadiumId || '11111111-1111-1111-1111-111111111111';
 
     const { data: amenities, error } = await supabase
-      .from<AmenityRow>('amenities')
+      .from('amenities')
       .select('*, zone:zones(*)')
       .eq('stadium_id', stadiumQueryId);
 
@@ -61,7 +61,7 @@ export const facilityService = {
 
   fetchFacilityById: async (id: string, matchId: string): Promise<FacilityViewModel | null> => {
     const { data, error } = await supabase
-      .from<AmenityRow>('amenities')
+      .from('amenities')
       .select('*, zone:zones(*)')
       .eq('id', id)
       .single();

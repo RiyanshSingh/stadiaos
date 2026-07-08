@@ -18,7 +18,7 @@ const deduplicateLatestQueueMetrics = (metrics: QueueMetricRow[]): QueueMetricRo
 export const queueService = {
   fetchQueueMetrics: async (matchId: string): Promise<QueueMetric[]> => {
     const { data, error } = await supabase
-      .from<QueueMetric>('queue_metrics')
+      .from('queue_metrics')
       .select('*')
       .eq('match_id', matchId)
       .order('captured_at', { ascending: false });
@@ -35,7 +35,7 @@ export const queueService = {
   
   fetchQueueMetricForAmenity: async (matchId: string, amenityId: string): Promise<QueueMetric | null> => {
     const { data, error } = await supabase
-      .from<QueueMetric>('queue_metrics')
+      .from('queue_metrics')
       .select('*')
       .eq('match_id', matchId)
       .eq('amenity_id', amenityId)

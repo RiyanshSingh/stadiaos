@@ -23,7 +23,7 @@ vi.mock('@/services/dashboardService', () => ({
 }));
 
 vi.mock('@/store/useAppStore', () => ({
-  default: {
+  useAppStore: {
     getState: vi.fn(() => ({
       profile: { full_name: 'Test Fan' },
       ticket: { seat_section: '214', seat_row: 'F', seat_number: '12' },

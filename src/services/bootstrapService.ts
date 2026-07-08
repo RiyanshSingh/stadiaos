@@ -27,7 +27,7 @@ function normalizeMatchFromTicket(ticketData: TicketRow): Match | null {
   return {
     ...candidate,
     title: candidate.title || (stadiumName ? `${stadiumName} Match` : 'Match'),
-    stadium_name: stadiumName
+    stadium_name: stadiumName || undefined
   };
 }
 
@@ -37,7 +37,7 @@ export const bootstrapService = {
       await requireAuthenticatedUser();
 
       const { data: profileData, error: profileError } = await supabase
-        .from<Profile>('profiles')
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
@@ -47,7 +47,7 @@ export const bootstrapService = {
 
       if (profileData.role === 'fan') {
         const { data: ticketData, error: ticketError } = await supabase
-          .from<TicketRow>('tickets')
+          .from('tickets')
           .select('*, matches(id, title, match_date, start_time, home_team, away_team, stadiums(name))')
           .eq('user_id', userId)
           .order('created_at', { ascending: false })

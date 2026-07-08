@@ -59,7 +59,7 @@ export const useFanAssistantService = create<FanAssistantState>((set, get) => ({
 
     try {
       const appStoreModule = await import('@/store/useAppStore');
-      const appStore = appStoreModule.default ?? appStoreModule.useAppStore;
+      const appStore = appStoreModule.useAppStore;
       const { profile, ticket, match } = appStore.getState();
 
       const userName = profile?.full_name || 'Fan';

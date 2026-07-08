@@ -109,7 +109,7 @@ export const opsService = {
     }
 
     const { data, error } = await supabase
-      .from<PublicAdvisory>('ai_recommendations')
+      .from('ai_recommendations')
       .select('id, title, content, created_at')
       .eq('match_id', matchId)
       .eq('recommendation_type', 'public_advisory')

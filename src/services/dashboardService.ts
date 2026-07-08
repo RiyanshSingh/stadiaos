@@ -38,11 +38,13 @@ export const dashboardService = {
     }
 
     const { data, error } = await supabase
-      .from<GateMetricRow>('crowd_metrics')
+      .from('crowd_metrics')
       .select('density_score, estimated_wait_minutes, zones(name, zone_type)')
       .eq('match_id', matchId)
       .order('captured_at', { ascending: false })
       .limit(10);
+      
+    const typedData = data as unknown as GateMetricRow[];
 
     if (error || !data) {
       if (error) {
@@ -54,7 +56,7 @@ export const dashboardService = {
     const seen = new Set<string>();
     const gates: GateStatus[] = [];
 
-    for (const metric of data) {
+    for (const metric of typedData) {
       if (!metric.zones || metric.zones.zone_type !== 'gate' || seen.has(metric.zones.name)) continue;
       seen.add(metric.zones.name);
 
@@ -75,7 +77,7 @@ export const dashboardService = {
     }
 
     const { data, error } = await supabase
-      .from<AiRecommendation>('ai_recommendations')
+      .from('ai_recommendations')
       .select('*')
       .eq('match_id', matchId)
       .order('created_at', { ascending: false });
@@ -126,7 +128,7 @@ export const dashboardService = {
       : null;
 
     const { data: queueData, error: queueError } = await supabase
-      .from<QueueMetricWithAmenity>('queue_metrics')
+      .from('queue_metrics')
       .select('estimated_wait_minutes, amenities(name, amenity_type)')
       .eq('match_id', matchId);
 
@@ -134,7 +136,7 @@ export const dashboardService = {
       console.error('Failed to fetch queue metrics for live status cards:', queueError);
     }
 
-    const queueRows = queueData ?? [];
+    const queueRows = (queueData ?? []) as unknown as QueueMetricWithAmenity[];
 
     return {
       gate: leastCongestedGate,

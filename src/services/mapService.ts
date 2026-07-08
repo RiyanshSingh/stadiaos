@@ -45,12 +45,12 @@ export const mapService = {
     const TEMPLATE_STADIUM_ID = '11111111-1111-1111-1111-111111111111';
 
     const { data: amenities } = await supabase
-      .from<AmenityRow>('amenities')
+      .from('amenities')
       .select('*, zone:zones(*)')
       .eq('stadium_id', TEMPLATE_STADIUM_ID);
 
     const { data: zones } = await supabase
-      .from<Zone>('zones')
+      .from('zones')
       .select('*')
       .eq('stadium_id', TEMPLATE_STADIUM_ID);
 
@@ -90,7 +90,7 @@ export const mapService = {
     const alerts = await alertService.fetchActiveAlerts(matchId);
 
     const { data: incidents } = await supabase
-      .from<IncidentWithZone>('incidents')
+      .from('incidents')
       .select('*, zone:zones(*)')
       .eq('match_id', matchId)
       .neq('status', 'resolved');
@@ -119,9 +119,9 @@ export const mapService = {
     const TEMPLATE_STADIUM_ID = '11111111-1111-1111-1111-111111111111';
 
     const [{ data: zones }, { data: amenities }, { data: routes }] = await Promise.all([
-      supabase.from<RouteNodeZone>('zones').select('*').eq('stadium_id', TEMPLATE_STADIUM_ID),
-      supabase.from<AmenityRouteRow>('amenities').select('*, zone:zones(metadata)').eq('stadium_id', TEMPLATE_STADIUM_ID),
-      supabase.from<RouteRow>('routes')
+      supabase.from('zones').select('*').eq('stadium_id', TEMPLATE_STADIUM_ID),
+      supabase.from('amenities').select('*, zone:zones(metadata)').eq('stadium_id', TEMPLATE_STADIUM_ID),
+      supabase.from('routes')
         .select('*, from_zone:zones!from_zone_id(metadata), to_zone:zones!to_zone_id(metadata)')
         .eq('stadium_id', TEMPLATE_STADIUM_ID)
     ]);

@@ -64,7 +64,7 @@ export const useAuthService = create<AuthState>((set, get) => ({
 
     const fetchProfile = async (uid: string, email?: string | null) => {
       const { data, error } = await supabase
-        .from<Profile>('profiles')
+        .from('profiles')
         .select('*')
         .eq('id', uid)
         .maybeSingle();
@@ -73,7 +73,7 @@ export const useAuthService = create<AuthState>((set, get) => ({
 
       if (!profileData && !error) {
         const { data: newProfile } = await supabase
-          .from<Profile>('profiles')
+          .from('profiles')
           .insert([
             {
               id: uid,
@@ -103,7 +103,7 @@ export const useAuthService = create<AuthState>((set, get) => ({
 
       if (profileData.role === 'ops_manager' && !get().matchId) {
         const { data: matches } = await supabase
-          .from<Match>('matches')
+          .from('matches')
           .select('id, stadium_id')
           .in('status', ['live', 'scheduled'])
           .order('start_time', { ascending: true })

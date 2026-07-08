@@ -44,7 +44,7 @@ const buildAdvisoryAlert = (advisory: AiRecommendation): Alert => ({
 export const alertService = {
   fetchActiveAlerts: async (matchId: string): Promise<Alert[]> => {
     const { data: incidentData, error: incidentError } = await supabase
-      .from<Incident>('incidents')
+      .from('incidents')
       .select('*')
       .eq('match_id', matchId)
       .in('severity', ['high', 'critical'])
@@ -55,7 +55,7 @@ export const alertService = {
     }
 
     const { data: advisoryData, error: advisoryError } = await supabase
-      .from<AiRecommendation>('ai_recommendations')
+      .from('ai_recommendations')
       .select('*')
       .eq('match_id', matchId)
       .eq('recommendation_type', 'public_advisory')
