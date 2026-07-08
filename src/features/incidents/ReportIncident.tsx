@@ -21,7 +21,7 @@ const itemVariants: Variants = {
 export function ReportIncident() {
   const navigate = useNavigate()
   const { reportIncident } = useIncidentService()
-  const { matchId, stadiumId, userId, role } = useAuthService()
+  const { matchId, stadiumId, userId: _userId, role: _role } = useAuthService()
   
   const [type, setType] = useState('medical')
   const [zone, setZone] = useState('Section 214')

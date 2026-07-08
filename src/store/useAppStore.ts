@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import type { Profile, Match, Ticket } from '@/lib/types/domain'
 import { bootstrapService } from '@/services/bootstrapService'
 import { supabase } from '@/services/supabase'
-import { groq } from '@/services/groq'
 
 export type Message = {
   id: string;

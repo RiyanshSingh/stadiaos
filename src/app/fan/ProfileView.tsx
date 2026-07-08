@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { 
   User, MapPin, Ticket, ShieldAlert, Bookmark, Bell, 
   Settings, LogOut, ChevronRight, Activity, Accessibility, 
-  Navigation, ArrowRight, Menu, X, Clock, Users, HeartPulse, Info
+  Navigation, ArrowRight, Menu, X, Users, Info
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Link } from 'react-router-dom'

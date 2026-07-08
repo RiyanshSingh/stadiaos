@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShieldAlert, ArrowRight, Loader2, AlertTriangle, Fingerprint } from 'lucide-react'
+import { ShieldAlert, Loader2, AlertTriangle, Fingerprint } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '@/services/supabase'
 import { useAuthService } from '@/services/authService'
@@ -14,7 +14,7 @@ export function OpsAuthView() {
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
+  const [_fullName, _setFullName] = useState('')
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -36,7 +36,7 @@ export function OpsAuthView() {
         });
       }
     }
-  }, [userId, role, navigate, location]);
+  }, [userId, role, navigate, location, initAuth]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

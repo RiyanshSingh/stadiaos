@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Bell, Search, MapPin, Coffee, AlertTriangle, ShieldAlert, HeartPulse, History, Navigation, Map, Ticket, UserSearch, Accessibility } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Variants } from 'framer-motion'
 import { Card } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAppStore } from '@/store/useAppStore'
 import { dashboardService } from '@/services/dashboardService'
 import type { GateStatus } from '@/services/dashboardService'
@@ -26,9 +25,9 @@ const itemVariants: Variants = {
 }
 
 export function FanDashboard() {
-  const { profile, match, ticket } = useAppStore()
+  const { match, ticket } = useAppStore()
   const [recommendations, setRecommendations] = useState<AiRecommendation[]>([])
-  const [gateStatus, setGateStatus] = useState<GateStatus[]>([])
+  const [_gateStatus, setGateStatus] = useState<GateStatus[]>([])
   const [activeAlertsCount, setActiveAlertsCount] = useState(0)
   const [liveStatusCards, setLiveStatusCards] = useState<LiveStatusCard[]>([])
 

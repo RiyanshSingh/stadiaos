@@ -1,4 +1,4 @@
-import { ArrowLeft, Bell, Navigation2, Ticket, MapPin, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Navigation2, Ticket, MapPin, AlertCircle } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { useNavigate } from 'react-router-dom'
 

@@ -1,4 +1,4 @@
-import { ArrowLeft, Search, Filter, Coffee, ShoppingBag, Stethoscope, Droplets, User, Navigation2, MapPin, Clock, Activity, Accessibility, Navigation, ArrowRight, HelpCircle } from 'lucide-react'
+import { ArrowLeft, Coffee, ShoppingBag, Stethoscope, Droplets, User, MapPin, Accessibility, ArrowRight, HelpCircle, Navigation } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { useNavigate, Link } from 'react-router-dom'
 import { useState, useMemo, useEffect } from 'react'

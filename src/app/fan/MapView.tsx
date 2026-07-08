@@ -2,12 +2,12 @@ import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   MapPin, Navigation2, X, AlertTriangle, Filter, Coffee, 
-  ArrowRight, HeartPulse, User, DoorOpen, Activity, AlertCircle,
-  Accessibility, Save, ShieldAlert, Navigation, Search, CheckCircle2
+  HeartPulse, User, DoorOpen, Activity, AlertCircle,
+  Accessibility, Save, ShieldAlert, Navigation
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Card } from '@/components/ui/card'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import { useAppStore } from '@/store/useAppStore'
@@ -77,6 +77,7 @@ export function MapView() {
       setRouteTo(dest)
       if (mode === 'accessible') setRouteAccessible(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export function MapView() {
       setMode('route')
       handleRouteGenerate(routeTo, true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, searchParams, routeTo])
 
   const userLocationPoint = useMemo(() => {

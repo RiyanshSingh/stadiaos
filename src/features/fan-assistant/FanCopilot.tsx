@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { 
   Send, Mic, Paperclip, MapPin, 
-  AlertTriangle, Navigation2, Ticket, 
-  Coffee, ArrowRight, Bot, ChevronLeft, ShieldAlert,
-  Sparkles
+  AlertTriangle, Navigation2, 
+  Coffee, ArrowRight, ChevronLeft, ShieldAlert
 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/card'

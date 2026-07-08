@@ -41,9 +41,9 @@ describe('opsService', () => {
   describe('fetchCommandCenterSnapshot', () => {
     it('aggregates data correctly from multiple sources', async () => {
       // Mock supabase count responses
-      const mockSelect = vi.fn().mockReturnThis();
-      const mockEq = vi.fn().mockReturnThis();
-      const mockNeq = vi.fn().mockResolvedValueOnce({ count: 5, error: null }) // incidents
+      const _mockSelect = vi.fn().mockReturnThis();
+      const _mockEq = vi.fn().mockReturnThis();
+      const _mockNeq = vi.fn().mockResolvedValueOnce({ count: 5, error: null }) // incidents
                            .mockResolvedValueOnce({ count: 2, error: null }); // advisories (it won't hit neq but eq)
       
       const mockFrom = vi.fn((table) => {

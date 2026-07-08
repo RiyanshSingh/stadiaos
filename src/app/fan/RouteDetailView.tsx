@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { ArrowLeft, MapPin, Navigation, Clock, ShieldAlert, Activity, Accessibility } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { ArrowLeft, MapPin, Navigation, ShieldAlert, Activity, Accessibility } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom'
 import { cn } from '@/lib/utils'
@@ -22,7 +22,7 @@ export function RouteDetailView() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const computeRoute = async (mode: RouteMode) => {
+  const computeRoute = useCallback(async (mode: RouteMode) => {
     if (!match?.stadium_id) {
       setError('No active match found.')
       setLoading(false)
@@ -59,11 +59,11 @@ export function RouteDetailView() {
       setError((outcome as Extract<typeof outcome, { ok: false }>).reason)
     }
     setLoading(false)
-  }
+  }, [match?.stadium_id, ticket, destLabel, id])
 
   useEffect(() => {
     computeRoute(routeMode)
-  }, [match?.stadium_id])
+  }, [match?.stadium_id, routeMode, computeRoute])
 
   const handleToggleAccessible = () => {
     const newMode: RouteMode = routeMode === 'accessible' ? 'standard' : 'accessible'

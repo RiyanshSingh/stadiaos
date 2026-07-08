@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldAlert, CheckCircle, MapPin, MessageSquare, Shield, Send, Sparkles } from 'lucide-react';
+import { ShieldAlert, CheckCircle, MapPin, Shield, Send, Sparkles } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useIncidentService } from '@/services/incidentService';
 import { useAuthService } from '@/services/authService';
 import { cn } from '@/lib/utils';
-import type { IncidentStatus, IncidentSeverity } from '@/lib/types/domain';
+import type { IncidentStatus } from '@/lib/types/domain';
 
 export function IncidentTriageDesk() {
   const { incidents, updateIncidentStatus, assignIncidentTeam, addIncidentNote } = useIncidentService();

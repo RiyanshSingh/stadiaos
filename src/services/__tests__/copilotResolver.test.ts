@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { copilotResolver } from '../copilotResolver';
 import { copilotIntentService } from '../copilotIntentService';
 import { facilityService } from '../facilityService';
-import { alertService } from '../alertService';
 import { routingService } from '../routing/routingService';
-import { useAppStore } from '../../store/useAppStore';
 
 vi.mock('../copilotIntentService');
 vi.mock('../facilityService');

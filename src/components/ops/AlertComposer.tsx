@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Megaphone, Send, CheckCircle2 } from 'lucide-react';
+import { Send, CheckCircle2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { opsService } from '@/services/opsService';
 import { useAuthService } from '@/services/authService';

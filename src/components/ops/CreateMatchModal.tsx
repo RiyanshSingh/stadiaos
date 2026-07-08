@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, MapPin, Clock, ShieldAlert } from 'lucide-react';
+import { X, Clock, ShieldAlert } from 'lucide-react';
 import { supabase } from '@/services/supabase';
 
 interface CreateMatchModalProps {

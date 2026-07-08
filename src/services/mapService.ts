@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import type { Zone, Amenity, Incident } from '@/lib/types/domain';
+import type { Zone, Amenity } from '@/lib/types/domain';
 import { alertService } from './alertService';
 import { buildVenueGraph } from './routing/venueGraph';
 import type { RouteGraph } from '@/lib/types/routing';
@@ -18,7 +18,7 @@ export type MapPoint = {
 };
 
 export const mapService = {
-  fetchExplorePoints: async (stadiumId: string, matchId: string): Promise<MapPoint[]> => {
+  fetchExplorePoints: async (_stadiumId: string, _matchId: string): Promise<MapPoint[]> => {
     const TEMPLATE_STADIUM_ID = '11111111-1111-1111-1111-111111111111';
 
     // 1. Fetch amenities
@@ -71,7 +71,7 @@ export const mapService = {
     return points;
   },
 
-  fetchLiveOverlays: async (matchId: string, stadiumId: string): Promise<MapPoint[]> => {
+  fetchLiveOverlays: async (matchId: string, _stadiumId: string): Promise<MapPoint[]> => {
     // For live mode, we fetch alerts and map them to points if they have coordinates
     const alerts = await alertService.fetchActiveAlerts(matchId);
     
@@ -110,7 +110,7 @@ export const mapService = {
     return points;
   },
 
-  fetchRouteGraph: async (stadiumId: string): Promise<RouteGraph> => {
+  fetchRouteGraph: async (_stadiumId: string): Promise<RouteGraph> => {
     const TEMPLATE_STADIUM_ID = '11111111-1111-1111-1111-111111111111';
 
     const [{ data: zones }, { data: amenities }, { data: routes }] = await Promise.all([

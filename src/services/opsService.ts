@@ -54,7 +54,7 @@ export const opsService = {
   },
 
   publishPublicAdvisory: async (matchId: string, stadiumId: string, title: string, content: string): Promise<void> => {
-    const userId = await requireOpsSession();
+    const _userId = await requireOpsSession();
     const { error } = await supabase
       .from('ai_recommendations')
       .insert([{

@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthService } from '@/services/authService'
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
 
 export function SettingsView() {
   const navigate = useNavigate()

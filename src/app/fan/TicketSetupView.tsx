@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShieldAlert, Ticket as TicketIcon, MapPin, Calendar, CheckCircle2, ChevronRight, Loader2, ArrowRight } from 'lucide-react'
+import { Ticket as TicketIcon, MapPin, ChevronRight, Loader2, ArrowRight } from 'lucide-react'
 import { supabase } from '@/services/supabase'
 import { useAuthService } from '@/services/authService'
 import { useAppStore } from '@/store/useAppStore'

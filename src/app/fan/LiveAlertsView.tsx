@@ -1,4 +1,4 @@
-import { ArrowLeft, AlertTriangle, CloudRain, ShieldAlert, Activity, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, AlertTriangle, ShieldAlert, CheckCircle2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'

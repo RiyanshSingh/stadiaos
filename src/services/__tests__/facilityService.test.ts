@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { facilityService } from '../facilityService';
-import { queueService } from '../queueService';
 
 // Mock Supabase to return fake amenities
 vi.mock('../supabase', () => ({

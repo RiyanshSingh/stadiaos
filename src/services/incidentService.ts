@@ -1,9 +1,8 @@
 import { create } from 'zustand';
 import { supabase } from '@/services/supabase';
 import { triageService } from '@/services/triageService';
-import { useAuthService } from '@/services/authService';
 import { requireOpsSession, requireFanSession } from '@/lib/authGuards';
-import type { Incident, IncidentSeverity, IncidentStatus } from '@/lib/types/domain';
+import type { Incident, IncidentStatus } from '@/lib/types/domain';
 
 interface IncidentState {
   incidents: Incident[]; // For ops dashboard

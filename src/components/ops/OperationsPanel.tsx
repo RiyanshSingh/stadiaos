@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DoorOpen, Coffee, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { opsService } from '@/services/opsService';
 import { useAuthService } from '@/services/authService';

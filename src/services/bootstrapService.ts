@@ -1,5 +1,5 @@
 import { supabase } from '@/services/supabase';
-import type { Profile, Match, Ticket } from '@/lib/types/domain';
+import type { Profile, Ticket } from '@/lib/types/domain';
 import { requireAuthenticatedUser } from '@/lib/authGuards';
 
 export const bootstrapService = {

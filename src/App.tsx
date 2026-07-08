@@ -163,9 +163,9 @@ function AnimatedRoutes() {
 }
 
 function App() {
-  const { initSupabase, loadBootstrap, profile } = useAppStore()
+  const { initSupabase, loadBootstrap, profile: _profile } = useAppStore()
   const { initAuth } = useAuthService()
-  const { userId, stadiumId, role } = useAuthService()
+  const { userId, stadiumId: _stadiumId, role } = useAuthService()
 
   useEffect(() => {
     initSupabase()

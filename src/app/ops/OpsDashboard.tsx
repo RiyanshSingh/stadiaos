@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import { ShieldAlert, Users, AlertTriangle, Activity, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Users, AlertTriangle, Activity } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useIncidentService } from '@/services/incidentService';
 import { opsService, type OpsSnapshot } from '@/services/opsService';
@@ -11,7 +11,6 @@ import { IncidentTriageDesk } from '@/components/ops/IncidentTriageDesk';
 import { AlertComposer } from '@/components/ops/AlertComposer';
 import { OperationsPanel } from '@/components/ops/OperationsPanel';
 import { CreateMatchModal } from '@/components/ops/CreateMatchModal';
-import { cn } from '@/lib/utils';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -73,7 +72,8 @@ export function OpsDashboard() {
     };
     
     resolveMatchForToday();
-  }, [opsStadiumId]);
+    resolveMatchForToday();
+  }, [opsStadiumId, setOpsMatchContext]);
 
   useEffect(() => {
     if (!matchId) {
@@ -106,8 +106,8 @@ export function OpsDashboard() {
   const isDegraded = activeCriticals > 0 || (snapshot?.highQueueFacilitiesCount ?? 0) > 3;
   const isElevated = activeCriticals === 0 && ((snapshot?.congestedGatesCount ?? 0) > 1 || (snapshot?.activeIncidentsCount ?? 0) > 5);
 
-  const statusText = isDegraded ? 'SYSTEM DEGRADED' : isElevated ? 'ELEVATED LOAD' : 'SYSTEM NOMINAL';
-  const statusColor = isDegraded ? 'text-red-400 bg-red-500/10 border-red-500/20' : 
+  const _statusText = isDegraded ? 'SYSTEM DEGRADED' : isElevated ? 'ELEVATED LOAD' : 'SYSTEM NOMINAL';
+  const _statusColor = isDegraded ? 'text-red-400 bg-red-500/10 border-red-500/20' : 
                       isElevated ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' : 
                       'text-white/80 bg-white/5 border-white/10';
 

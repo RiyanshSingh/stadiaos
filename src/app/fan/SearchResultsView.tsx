@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft, Search, MapPin, Coffee, ShieldAlert, Ticket, Navigation2, Info } from 'lucide-react'
+import { ArrowLeft, Search, Coffee, ShieldAlert, Ticket, Navigation2, Info } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { useNavigate, Link } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
 
 export function SearchResultsView() {
   const navigate = useNavigate()

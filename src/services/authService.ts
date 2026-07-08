@@ -114,6 +114,6 @@ export const useAuthService = create<AuthState>((set, get) => ({
       fullName: null
     });
     // Clear legacy persisted auth from localStorage if it exists
-    try { localStorage.removeItem('stadiaos-auth-storage'); } catch (_) {}
+    try { localStorage.removeItem('stadiaos-auth-storage'); } catch { /* ignore */ }
   }
 }));

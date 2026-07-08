@@ -69,7 +69,7 @@ export const dashboardService = {
       }));
 
       // Insert into DB so we don't generate next time
-      const inserts = aiRecs.map(({id, ...rest}) => rest); // remove temp ID for insert
+      const inserts = aiRecs.map(({id: _id, ...rest}) => rest); // remove temp ID for insert
       await supabase.from('ai_recommendations').insert(inserts);
 
       return aiRecs as AiRecommendation[];
