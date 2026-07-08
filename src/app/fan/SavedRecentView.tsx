@@ -19,7 +19,7 @@ export function SavedRecentView() {
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 space-y-8">
         
         <section>
-          <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Saved Routes</h2>
+          <h2 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Saved Routes</h2>
           <div className="space-y-3">
             <Link to="/map?dest=gate_c" className="block group">
               <Card className="glass-card p-5 rounded-3xl border border-white/5 bg-white/[0.03] flex items-center justify-between hover:bg-white/[0.05] transition-colors">
@@ -32,14 +32,14 @@ export function SavedRecentView() {
                     <p className="text-[11px] font-medium text-white/50 mt-0.5">Custom Route via Gate C</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-white/60 group-hover:text-white/60 transition-colors" />
               </Card>
             </Link>
           </div>
         </section>
 
         <section>
-          <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Saved Facilities</h2>
+          <h2 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Saved Facilities</h2>
           <div className="space-y-3">
             <Link to="/facility/fac_gate_b" className="block group">
               <Card className="glass-card p-5 rounded-3xl border border-white/5 bg-white/[0.03] flex items-center justify-between hover:bg-white/[0.05] transition-colors">
@@ -52,14 +52,14 @@ export function SavedRecentView() {
                     <p className="text-[11px] font-medium text-white/50 mt-0.5">Section 214 Concourse</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-white/60 group-hover:text-white/60 transition-colors" />
               </Card>
             </Link>
           </div>
         </section>
 
         <section>
-          <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Recent Copilot Asks</h2>
+          <h2 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Recent Copilot Asks</h2>
           <div className="space-y-3">
             <Link to="/copilot?q=washroom" className="block group">
               <Card className="glass-card p-5 rounded-3xl border border-white/5 bg-white/[0.03] flex items-start gap-4 hover:bg-white/[0.05] transition-colors">
@@ -68,7 +68,7 @@ export function SavedRecentView() {
                 </div>
                 <div>
                   <p className="text-[15px] font-medium italic text-white/80 leading-snug">"Where is the nearest washroom with no line?"</p>
-                  <div className="flex items-center gap-1 mt-2 text-[10px] uppercase font-bold tracking-widest text-white/30">
+                  <div className="flex items-center gap-1 mt-2 text-[10px] uppercase font-bold tracking-widest text-white/60">
                     <Activity className="w-3 h-3" />
                     <span>2 hours ago</span>
                   </div>

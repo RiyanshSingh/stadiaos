@@ -28,7 +28,7 @@ export function SettingsView() {
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 space-y-8">
         
         <section>
-          <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Account</h2>
+          <h2 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Account</h2>
           <Card className="glass-card rounded-3xl border border-white/5 bg-white/[0.03] overflow-hidden">
             <Link to="/profile" className="flex items-center justify-between p-5 border-b border-white/5 hover:bg-white/[0.05] transition-colors group">
               <div className="flex items-center gap-4">
@@ -37,7 +37,7 @@ export function SettingsView() {
                 </div>
                 <span className="font-bold text-[15px] tracking-tight text-white/90">Personal Info</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+              <ChevronRight className="w-4 h-4 text-white/60 group-hover:text-white/60 transition-colors" />
             </Link>
             
             <button onClick={toggleLanguage} className="w-full flex items-center justify-between p-5 hover:bg-white/[0.05] transition-colors group">
@@ -49,14 +49,14 @@ export function SettingsView() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[13px] font-bold text-white/50">{lang}</span>
-                <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-white/60 group-hover:text-white/60 transition-colors" />
               </div>
             </button>
           </Card>
         </section>
 
         <section>
-          <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Preferences</h2>
+          <h2 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Preferences</h2>
           <Card className="glass-card rounded-3xl border border-white/5 bg-white/[0.03] overflow-hidden">
             <Link to="/notifications" className="flex items-center justify-between p-5 border-b border-white/5 hover:bg-white/[0.05] transition-colors group">
               <div className="flex items-center gap-4">
@@ -65,7 +65,7 @@ export function SettingsView() {
                 </div>
                 <span className="font-bold text-[15px] tracking-tight text-white/90">Notifications</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+              <ChevronRight className="w-4 h-4 text-white/60 group-hover:text-white/60 transition-colors" />
             </Link>
             
             <Link to="/accessibility" className="flex items-center justify-between p-5 hover:bg-white/[0.05] transition-colors group">
@@ -75,7 +75,7 @@ export function SettingsView() {
                 </div>
                 <span className="font-bold text-[15px] tracking-tight text-white/90">Accessibility Options</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+              <ChevronRight className="w-4 h-4 text-white/60 group-hover:text-white/60 transition-colors" />
             </Link>
           </Card>
         </section>

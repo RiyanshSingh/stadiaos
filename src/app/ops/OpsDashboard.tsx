@@ -167,6 +167,15 @@ export function OpsDashboard() {
                   Delete Match
                 </button>
               )}
+              <button 
+                onClick={async () => {
+                  await logout();
+                  window.location.href = '/auth';
+                }}
+                className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-1.5 text-[13px] font-medium text-white/70 hover:text-white transition-colors whitespace-nowrap"
+              >
+                Log Out
+              </button>
             </div>
         </motion.header>
 
@@ -184,7 +193,7 @@ export function OpsDashboard() {
           <>
             <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
           <Card className="glass-card p-6 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors relative overflow-hidden">
-            <div className="flex items-center gap-2 text-white/40 mb-4">
+            <div className="flex items-center gap-2 text-white/70 mb-4">
               <AlertTriangle className="w-4 h-4" />
               <span className="text-[10px] uppercase tracking-widest font-bold">Open Incidents</span>
             </div>
@@ -193,7 +202,7 @@ export function OpsDashboard() {
           </Card>
           
           <Card className="glass-card p-6 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors relative overflow-hidden">
-            <div className="flex items-center gap-2 text-white/40 mb-4">
+            <div className="flex items-center gap-2 text-white/70 mb-4">
               <Activity className="w-4 h-4" />
               <span className="text-[10px] uppercase tracking-widest font-bold">Active Advisories</span>
             </div>
@@ -202,7 +211,7 @@ export function OpsDashboard() {
           </Card>
 
           <Card className="glass-card p-6 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors relative overflow-hidden">
-            <div className="flex items-center gap-2 text-white/40 mb-4">
+            <div className="flex items-center gap-2 text-white/70 mb-4">
               <Users className="w-4 h-4" />
               <span className="text-[10px] uppercase tracking-widest font-bold">Congested Gates</span>
             </div>
@@ -211,7 +220,7 @@ export function OpsDashboard() {
           </Card>
 
           <Card className="glass-card p-6 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors relative overflow-hidden">
-            <div className="flex items-center gap-2 text-white/40 mb-4">
+            <div className="flex items-center gap-2 text-white/70 mb-4">
               <Users className="w-4 h-4" />
               <span className="text-[10px] uppercase tracking-widest font-bold">High Queue Facilities</span>
             </div>

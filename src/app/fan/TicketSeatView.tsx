@@ -44,7 +44,7 @@ export function TicketSeatView() {
             <div className="flex justify-between items-start mb-8 relative z-10">
               <div className="pr-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Match Pass</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Match Pass</p>
                   <Link to="/ticket-setup" className="text-[9px] font-bold text-white/60 uppercase tracking-widest bg-white/10 hover:bg-white/20 transition-colors px-1.5 py-0.5 rounded-sm">Edit</Link>
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight text-white/90 leading-tight">{match?.title || 'No Active Match'}</h2>
@@ -57,15 +57,15 @@ export function TicketSeatView() {
 
             <div className="grid grid-cols-3 gap-3 border-t border-white/10 pt-6 mb-6">
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Sec</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-1">Sec</p>
                 <p className="text-2xl font-bold tracking-tight">{ticket?.seat_section || '---'}</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Row</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-1">Row</p>
                 <p className="text-2xl font-bold tracking-tight">{ticket?.seat_row || '---'}</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Seat</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-1">Seat</p>
                 <p className="text-2xl font-bold tracking-tight text-white">{ticket?.seat_number || '---'}</p>
               </div>
             </div>
@@ -82,7 +82,7 @@ export function TicketSeatView() {
 
         {/* Seat Assistance Actions */}
         <section>
-          <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Seat Assistance</h3>
+          <h3 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Seat Assistance</h3>
           <div className="grid grid-cols-2 gap-3">
             <Link to={hasTicket ? `/map?dest=section_${ticket.seat_section}` : '/map'} className="block h-full">
               <Card className="glass-card h-full p-5 rounded-3xl border border-white/5 hover:bg-white/10 transition-colors flex flex-col items-center justify-center gap-3 text-center bg-white/[0.03]">

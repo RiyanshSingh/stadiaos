@@ -7,11 +7,10 @@ import { useAuthService } from '@/services/authService'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
-export function AuthView() {
+export function OpsAuthView() {
   const navigate = useNavigate()
   const location = useLocation()
   const { userId, role, initAuth } = useAuthService()
-  const [isSignUp, setIsSignUp] = useState(false)
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -21,28 +20,20 @@ export function AuthView() {
   const [error, setError] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   
-  // Redirect to onboarding if they haven't seen it this session, unless they are trying to access /ops
-  useEffect(() => {
-    const fromPath = (location.state as any)?.from?.pathname;
-    const isOpsIntent = fromPath && fromPath.startsWith('/ops');
-    
-    if (!sessionStorage.getItem('has_seen_onboarding') && !isOpsIntent) {
-      navigate('/onboarding', { replace: true, state: location.state });
-    }
-  }, [navigate, location.state]);
+  // No onboarding for Ops
 
   // Auto-redirect if already logged in and role resolved
   useEffect(() => {
     if (userId && role) {
       if (role === 'ops_manager') {
+        const from = (location.state as any)?.from?.pathname;
+        navigate(from && from.startsWith('/ops') ? from : '/ops', { replace: true });
+      } else if (role === 'fan') {
         // Log them out!
         supabase.auth.signOut().then(() => {
           initAuth();
-          setError('Ops Managers must log in via the /opsauth portal.');
+          setError('Fans are not authorized for Ops access. Please log out and use the Fan portal.');
         });
-      } else if (role === 'fan') {
-        const from = (location.state as any)?.from?.pathname;
-        navigate(from && !from.startsWith('/ops') ? from : '/', { replace: true });
       }
     }
   }, [userId, role, navigate, location]);
@@ -54,32 +45,11 @@ export function AuthView() {
     setLoading(true)
 
     try {
-      if (isSignUp) {
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName
-            }
-          }
-        })
-        if (signUpError) throw signUpError;
-        
-        if (data.session) {
-          // Auto-login worked (confirmations disabled)
-          // `authService` onAuthStateChange will handle role fetch and redirect
-        } else {
-          setSuccessMsg('Signup successful! Please check your email to confirm your account before logging in.');
-        }
-      } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password
         })
         if (signInError) throw signInError;
-        // Success. authService will pick up the session and set state, which triggers the redirect above.
-      }
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
     } finally {
@@ -103,9 +73,9 @@ export function AuthView() {
             <div className="w-16 h-16 bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center mb-6 shadow-2xl backdrop-blur-xl">
               <ShieldAlert className="w-8 h-8 text-white/90" strokeWidth={1.5} />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">StadiaOS</h1>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Command Center</h1>
             <p className="text-[13px] text-white/50 uppercase tracking-widest font-bold">
-              {isSignUp ? 'Create Fan Account' : 'Fan Identity Gateway'}
+              Ops Identity Gateway
             </p>
           </div>
 
@@ -141,21 +111,7 @@ export function AuthView() {
               </AnimatePresence>
 
 
-              {isSignUp && (
-                <div className="space-y-1.5">
-                  <label htmlFor="auth-full-name" className="text-[11px] font-bold text-white/70 uppercase tracking-widest px-1">Full Name</label>
-                  <input
-                    id="auth-full-name"
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full h-12 bg-black/50 border border-white/10 rounded-2xl px-4 text-[15px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    placeholder="Enter your name"
-                    autoComplete="name"
-                  />
-                </div>
-              )}
+
               <div className="space-y-1.5">
                 <label htmlFor="auth-email" className="text-[11px] font-bold text-white/70 uppercase tracking-widest px-1">Email Address</label>
                 <input
@@ -181,7 +137,7 @@ export function AuthView() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full h-12 bg-black/50 border border-white/10 rounded-2xl px-4 text-[15px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                   placeholder="••••••••"
-                  autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                  autoComplete="current-password"
                 />
               </div>
 
@@ -198,30 +154,17 @@ export function AuthView() {
                 ) : (
                   <>
                     <Fingerprint className="w-5 h-5" />
-                    {isSignUp ? 'Create Account' : 'Authenticate'}
+                    Authenticate
                   </>
                 )}
               </button>
             </form>
 
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp)
-                  setError(null)
-                  setSuccessMsg(null)
-                }}
-                className="text-[13px] text-white/70 hover:text-white/80 font-medium transition-colors"
-              >
-                {isSignUp ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
-              </button>
-            </div>
+
           </Card>
           
-          <div className="mt-8 flex justify-between px-2 text-center text-[11px] text-white/60 uppercase tracking-widest font-bold">
-            <p>Secure Fan Access</p>
-            <a href="/opsauth" className="hover:text-white transition-colors">Ops Portal &rarr;</a>
+          <div className="mt-8 text-center text-[11px] text-white/60 uppercase tracking-widest font-bold">
+            <p>Secure StadiaOS Access</p>
           </div>
         </motion.div>
       </main>

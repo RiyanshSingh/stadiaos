@@ -79,14 +79,14 @@ export function ProfileInfoView() {
               <User className="w-8 h-8 text-white/50" />
             </div>
             <h2 className="text-xl font-bold tracking-tight">{profile?.full_name}</h2>
-            <p className="text-xs text-white/40 font-medium uppercase tracking-widest mt-1">Fan Account</p>
+            <p className="text-xs text-white/70 font-medium uppercase tracking-widest mt-1">Fan Account</p>
           </div>
 
           <form onSubmit={handleSave} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold px-1">Full Name</label>
+              <label className="text-[10px] text-white/70 uppercase tracking-widest font-bold px-1">Full Name</label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
                 <Input
                   required
                   value={fullName}
@@ -98,9 +98,9 @@ export function ProfileInfoView() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold px-1">Email (Read Only)</label>
+              <label className="text-[10px] text-white/70 uppercase tracking-widest font-bold px-1">Email (Read Only)</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
                 <Input
                   disabled
                   value={profile?.email || email || ''}
@@ -110,9 +110,9 @@ export function ProfileInfoView() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold px-1">Phone Number</label>
+              <label className="text-[10px] text-white/70 uppercase tracking-widest font-bold px-1">Phone Number</label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
                 <Input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}

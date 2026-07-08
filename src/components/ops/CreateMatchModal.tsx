@@ -102,7 +102,7 @@ export function CreateMatchModal({ isOpen, onClose, onSuccess, stadiumId }: Crea
               <div className="space-y-1.5 col-span-2">
                 <label className="text-[11px] font-bold text-white/60 uppercase tracking-widest pl-1">Start Time *</label>
                 <div className="relative">
-                  <Clock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+                  <Clock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/70" />
                   <input required value={startTime} onChange={e => setStartTime(e.target.value)} type="time" className="w-full bg-[rgba(255,255,255,0.05)] border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-white/30" style={{ colorScheme: 'dark' }} />
                 </div>
               </div>

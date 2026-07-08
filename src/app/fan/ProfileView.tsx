@@ -20,13 +20,13 @@ export function ProfileView() {
   const computedGate = ticket?.gate || (ticket?.seat_section ? SECTION_GATE_MAP[ticket.seat_section] : null);
 
   return (
-    <div className="h-screen w-full bg-black text-white overflow-y-auto pb-32">
+    <main className="h-screen w-full bg-black text-white overflow-y-auto pb-32">
       
       {/* 1. Profile Header */}
-      <div className="px-6 pt-12 pb-6 relative">
+      <header className="px-6 pt-12 pb-6 relative">
         <div className="flex justify-between items-start mb-6">
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Fan Account</span>
+            <span className="text-[10px] font-bold tracking-widest text-white/70 uppercase">Fan Account</span>
             <h1 className="text-2xl font-bold tracking-tight text-white">{profile?.full_name || 'Fan Profile'}</h1>
             <div className="flex items-center gap-2 text-white/50 text-xs font-medium mt-1">
               <span>ID: {profile?.id?.split('-')[0].toUpperCase() || '---'}</span>
@@ -51,22 +51,22 @@ export function ProfileView() {
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="px-6 space-y-8">
 
         {/* 2. My Matchday */}
         <section>
-          <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">My Matchday</h2>
+          <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">My Matchday</h2>
           <Card className="glass-card border border-white/5 p-5 rounded-3xl bg-white/[0.03]">
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2.5">
                 <div className="flex items-center gap-2">
-                  <p className="text-[11px] text-white/40 uppercase tracking-widest font-bold">Seat Assignment</p>
+                  <p className="text-[11px] text-white/70 uppercase tracking-widest font-bold">Seat Assignment</p>
                   <Link to="/ticket-setup" className="text-[9px] font-bold text-white/60 uppercase tracking-widest bg-white/10 hover:bg-white/20 transition-colors px-1.5 py-0.5 rounded-sm">Edit</Link>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-[11px] text-white/40 uppercase tracking-widest font-bold">Entry Gate</p>
+                  <p className="text-[11px] text-white/70 uppercase tracking-widest font-bold">Entry Gate</p>
                 </div>
               </div>
               
@@ -112,7 +112,7 @@ export function ProfileView() {
         {/* 3. My Reports */}
         <section>
           <div className="flex justify-between items-center mb-3 px-1">
-            <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest">My Reports</h2>
+            <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest">My Reports</h2>
             <Link to="/my-reports" className="text-[11px] font-bold text-white/50 hover:text-white transition-colors uppercase tracking-widest">View All</Link>
           </div>
           <Link to="/my-reports" className="block">
@@ -135,23 +135,23 @@ export function ProfileView() {
 
         {/* 4. Saved / Recent */}
         <section>
-          <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Saved & Recent</h2>
+          <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Saved & Recent</h2>
           <div className="grid grid-cols-2 gap-3">
             <Link to="/saved">
               <Card className="glass-card border border-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors bg-white/[0.03] flex flex-col justify-between h-28">
-                <Bookmark className="w-5 h-5 text-white/40" />
+                <Bookmark className="w-5 h-5 text-white/70" />
                 <div>
                   <h3 className="font-semibold text-[13px] tracking-tight text-white/90">Saved Routes</h3>
-                  <p className="text-[11px] font-medium tracking-tight text-white/40 mt-0.5">2 locations</p>
+                  <p className="text-[11px] font-medium tracking-tight text-white/70 mt-0.5">2 locations</p>
                 </div>
               </Card>
             </Link>
             <Link to="/copilot">
               <Card className="glass-card border border-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors bg-white/[0.03] flex flex-col justify-between h-28">
-                <Activity className="w-5 h-5 text-white/40" />
+                <Activity className="w-5 h-5 text-white/70" />
                 <div>
                   <h3 className="font-semibold text-[13px] tracking-tight text-white/90">Recent Asks</h3>
-                  <p className="text-[11px] font-medium tracking-tight text-white/40 mt-0.5">3 chat logs</p>
+                  <p className="text-[11px] font-medium tracking-tight text-white/70 mt-0.5">3 chat logs</p>
                 </div>
               </Card>
             </Link>
@@ -160,7 +160,7 @@ export function ProfileView() {
 
         {/* 5. Notifications & Alerts */}
         <section>
-          <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Notifications</h2>
+          <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Notifications</h2>
           <Card className="glass-card border border-white/5 rounded-2xl overflow-hidden bg-white/[0.03]">
             <Link to="/alerts" className="w-full flex items-center justify-between p-4 border-b border-white/5 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-3">
@@ -169,7 +169,7 @@ export function ProfileView() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/90 text-[10px] font-bold tracking-widest">2 NEW</span>
-                <ChevronRight className="w-4 h-4 text-white/30" />
+                <ChevronRight className="w-4 h-4 text-white/60" />
               </div>
             </Link>
             <Link to="/map" className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
@@ -177,21 +177,21 @@ export function ProfileView() {
                 <MapPin className="w-5 h-5 text-white/50" />
                 <span className="font-medium text-[13px] text-white/90">Gate Changes</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/30" />
+              <ChevronRight className="w-4 h-4 text-white/60" />
             </Link>
           </Card>
         </section>
 
         {/* 6. Accessibility & Preferences */}
         <section>
-          <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Preferences</h2>
+          <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Preferences</h2>
           <Card className="glass-card border border-white/5 rounded-2xl overflow-hidden bg-white/[0.03]">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
                 <Accessibility className="w-5 h-5 text-white/50" />
                 <div>
                   <p className="font-medium text-[13px] text-white/90 tracking-tight">Accessible Routing</p>
-                  <p className="text-[11px] font-medium tracking-tight text-white/40 mt-0.5">Prioritize elevators & ramps</p>
+                  <p className="text-[11px] font-medium tracking-tight text-white/70 mt-0.5">Prioritize elevators & ramps</p>
                 </div>
               </div>
               <button 
@@ -211,15 +211,15 @@ export function ProfileView() {
 
         {/* 7. Support / FAQ */}
         <section>
-          <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Support</h2>
+          <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Support</h2>
           <Card className="glass-card border border-white/5 rounded-2xl overflow-hidden bg-white/[0.03]">
             <Link to="/venue-info" className="w-full flex items-center justify-between p-4 border-b border-white/5 hover:bg-white/5 transition-colors">
               <span className="font-medium text-[13px] text-white/90">Venue Policies</span>
-              <ChevronRight className="w-4 h-4 text-white/30" />
+              <ChevronRight className="w-4 h-4 text-white/60" />
             </Link>
             <Link to="/accessibility" className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
               <span className="font-medium text-[13px] text-white/90">Help Center & FAQ</span>
-              <ChevronRight className="w-4 h-4 text-white/30" />
+              <ChevronRight className="w-4 h-4 text-white/60" />
             </Link>
           </Card>
         </section>
@@ -232,7 +232,7 @@ export function ProfileView() {
                 <Settings className="w-5 h-5 text-white/50" />
                 <span className="font-medium text-[13px] text-white/90">Account Settings</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/30" />
+              <ChevronRight className="w-4 h-4 text-white/60" />
             </Link>
             <button 
               onClick={() => { appLogout(); logout(); }}
@@ -258,7 +258,19 @@ export function ProfileView() {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-0 z-[60] flex items-end"
           >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+              role="button"
+              tabIndex={0}
+              aria-label="Close menu overlay"
+              onClick={() => setIsMenuOpen(false)} 
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                  e.preventDefault();
+                  setIsMenuOpen(false);
+                }
+              }}
+            />
             <div className="w-full h-[85vh] bg-black border-t border-white/10 rounded-t-3xl relative flex flex-col shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
               <div className="p-4 flex justify-center border-b border-white/5">
                 <div className="w-12 h-1.5 bg-white/20 rounded-full" />
@@ -297,6 +309,6 @@ export function ProfileView() {
         )}
       </AnimatePresence>
 
-    </div>
+    </main>
   )
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '@/services/supabase';
 import { triageService } from '@/services/triageService';
 import { useAuthService } from '@/services/authService';
+import { requireOpsSession, requireFanSession } from '@/lib/authGuards';
 import type { Incident, IncidentSeverity, IncidentStatus } from '@/lib/types/domain';
 
 interface IncidentState {
@@ -19,7 +20,7 @@ interface IncidentState {
   // Fan Methods
   fetchMyIncidents: (userId: string) => Promise<void>;
   subscribeToMyIncidents: (userId: string) => void;
-  reportIncident: (incidentData: any, matchId: string, stadiumId: string, reporterId: string, role: string) => Promise<void>;
+  reportIncident: (incidentData: any, matchId: string, stadiumId: string) => Promise<void>;
 }
 
 export const useIncidentService = create<IncidentState>((set, get) => ({
@@ -28,6 +29,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
 
   // --- OPS METHODS ---
   fetchIncidents: async (matchId) => {
+    await requireOpsSession();
     const { data, error } = await supabase
       .from('incidents')
       .select('*')
@@ -42,11 +44,11 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
   },
   
   resolveIncident: async (id) => {
+    const sessionUserId = await requireOpsSession();
     // Optimistic update
     set((state) => ({
       incidents: state.incidents.map(inc => inc.id === id ? { ...inc, status: 'resolved' as IncidentStatus } : inc)
     }));
-    const sessionUserId = useAuthService.getState().userId;
     await supabase.from('incidents').update({ status: 'resolved' }).eq('id', id);
     await supabase.from('incident_updates').insert([{
       incident_id: id,
@@ -57,10 +59,10 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
   },
 
   updateIncidentStatus: async (id, oldStatus, newStatus, note) => {
+    const sessionUserId = await requireOpsSession();
     set((state) => ({
       incidents: state.incidents.map(inc => inc.id === id ? { ...inc, status: newStatus } : inc)
     }));
-    const sessionUserId = useAuthService.getState().userId;
     await supabase.from('incidents').update({ status: newStatus }).eq('id', id);
     await supabase.from('incident_updates').insert([{
       incident_id: id,
@@ -72,10 +74,10 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
   },
 
   assignIncidentTeam: async (id, team) => {
+    const sessionUserId = await requireOpsSession();
     set((state) => ({
       incidents: state.incidents.map(inc => inc.id === id ? { ...inc, assigned_team: team as any } : inc)
     }));
-    const sessionUserId = useAuthService.getState().userId;
     await supabase.from('incidents').update({ assigned_team: team }).eq('id', id);
     await supabase.from('incident_updates').insert([{
       incident_id: id,
@@ -85,7 +87,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
   },
 
   addIncidentNote: async (id, note) => {
-    const sessionUserId = useAuthService.getState().userId;
+    const sessionUserId = await requireOpsSession();
     await supabase.from('incident_updates').insert([{
       incident_id: id,
       note: note,
@@ -109,6 +111,7 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
 
   // --- FAN METHODS ---
   fetchMyIncidents: async (userId) => {
+    await requireFanSession();
     const { data, error } = await supabase
       .from('incidents')
       .select('*, updates:incident_updates(*)')
@@ -144,8 +147,9 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
     }
   },
 
-  reportIncident: async (incidentData, matchId, stadiumId, reporterId, role) => {
+  reportIncident: async (incidentData, matchId, stadiumId) => {
     try {
+      const sessionUserId = await requireFanSession();
       // 1. Triage using AI
       const triage = await triageService.analyzeIncident(incidentData);
       
@@ -153,8 +157,8 @@ export const useIncidentService = create<IncidentState>((set, get) => ({
       const { data: newIncident, error } = await supabase.from('incidents').insert([{
         match_id: matchId,
         stadium_id: stadiumId,
-        reported_by: reporterId,
-        reporter_role: role,
+        reported_by: sessionUserId,
+        reporter_role: 'fan',
         title: incidentData.type,
         description: `Location: ${incidentData.zone} | ${incidentData.description}`,
         incident_type: 'general_help', // Simplification for MVP

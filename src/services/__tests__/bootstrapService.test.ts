@@ -5,6 +5,10 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('@/lib/authGuards', () => ({
+  requireAuthenticatedUser: vi.fn(),
+}));
+
 // Mock supabase using a factory function (no top-level vars, vitest hoists vi.mock)
 vi.mock('@/services/supabase', () => {
   const maybySingle = vi.fn();
@@ -37,13 +41,17 @@ describe('bootstrapService', () => {
     vi.clearAllMocks();
   });
 
-  it('returns null when profile fetch throws an error', async () => {
+  it('throws an error when profile fetch throws an error', async () => {
     getMaybeSingle().mockRejectedValueOnce(new Error('DB connection failed'));
-    const result = await bootstrapService.loadAppBootstrapData('user-123');
-    expect(result).toBeNull();
+    await expect(bootstrapService.loadAppBootstrapData('user-123')).rejects.toThrow('DB connection failed');
   });
 
-  it('returns profile with null ticket when user has no tickets', async () => {
+  it('throws an error when profile is not found', async () => {
+    getMaybeSingle().mockResolvedValueOnce({ data: null, error: null });
+    await expect(bootstrapService.loadAppBootstrapData('user-123')).rejects.toThrow('Profile not found. Re-authentication required.');
+  });
+
+  it('returns profile with null ticket when fan has no tickets', async () => {
     const mockProfile = { id: 'user-123', role: 'fan', email: 'fan@test.com', full_name: 'Fan User' };
     getMaybeSingle()
       .mockResolvedValueOnce({ data: mockProfile, error: null }) // profile
@@ -65,3 +73,4 @@ describe('bootstrapService', () => {
     expect(result?.match).toBeNull();
   });
 });
+

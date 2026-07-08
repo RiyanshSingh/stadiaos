@@ -24,7 +24,7 @@ export function FacilityDetailView() {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-white/30 text-[13px] font-medium uppercase tracking-widest">Loading facility...</p>
+        <p className="text-white/60 text-[13px] font-medium uppercase tracking-widest">Loading facility...</p>
       </div>
     )
   }
@@ -32,7 +32,7 @@ export function FacilityDetailView() {
   if (!facility) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-white/30 text-[13px] font-medium uppercase tracking-widest mb-4">Facility not found.</p>
+        <p className="text-white/60 text-[13px] font-medium uppercase tracking-widest mb-4">Facility not found.</p>
         <button onClick={() => navigate(-1)} className="px-6 py-3 bg-white/10 rounded-2xl text-[13px] font-bold uppercase tracking-widest">Go Back</button>
       </div>
     )
@@ -56,7 +56,7 @@ export function FacilityDetailView() {
           <Card className="glass-card p-6 border-0 bg-white/[0.04] rounded-[2rem] relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-3xl" />
             
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">{facility.type}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-2">{facility.type}</p>
             <h2 className="text-3xl font-bold tracking-tight mb-2 text-white/90">{facility.name}</h2>
             <div className="flex items-center gap-1.5 text-[13px] font-medium text-white/50 mb-8">
               <MapPin className="w-4 h-4" /> {facility.zone}
@@ -64,13 +64,13 @@ export function FacilityDetailView() {
             
             <div className="flex gap-3">
               <div className="flex-1 p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center justify-center">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Wait Time</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-1">Wait Time</p>
                 <p className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                   <Clock className="w-4 h-4 text-white/50" /> {facility.wait}
                 </p>
               </div>
               <div className="flex-1 p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center justify-center">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Crowd</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-1">Crowd</p>
                 <p className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                   <Activity className="w-4 h-4 text-white/50" /> {facility.crowd}
                 </p>
@@ -83,7 +83,7 @@ export function FacilityDetailView() {
         <section className="space-y-4">
           <div className="flex items-center gap-4 p-5 bg-white/[0.03] rounded-3xl border border-white/5">
             <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 shrink-0">
-              <Accessibility className={`w-5 h-5 ${facility.accessible ? 'text-white' : 'text-white/30'}`} />
+              <Accessibility className={`w-5 h-5 ${facility.accessible ? 'text-white' : 'text-white/60'}`} />
             </div>
             <div>
               <p className="text-[13px] font-bold tracking-tight text-white/90">{facility.accessible ? 'Fully Accessible' : 'Not marked accessible'}</p>
@@ -98,7 +98,7 @@ export function FacilityDetailView() {
 
         {/* Alternatives (Mocked for now without routing/geo) */}
         <section>
-          <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Nearby Alternatives</h3>
+          <h3 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Nearby Alternatives</h3>
           <div className="space-y-3">
             <Link to="/map" className="block">
               <Card className="glass-card p-5 rounded-3xl border border-white/5 bg-white/[0.03] flex items-center justify-between hover:bg-white/[0.05] transition-colors">

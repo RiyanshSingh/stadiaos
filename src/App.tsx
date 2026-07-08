@@ -32,6 +32,7 @@ const SettingsView = lazy(() => import('@/app/fan/SettingsView').then(m => ({ de
 const AuthView = lazy(() => import('@/app/auth/AuthView').then(m => ({ default: m.AuthView })))
 const OnboardingView = lazy(() => import('@/app/auth/OnboardingView').then(m => ({ default: m.OnboardingView })))
 const TicketSetupView = lazy(() => import('@/app/fan/TicketSetupView').then(m => ({ default: m.TicketSetupView })))
+const OpsAuthView = lazy(() => import('@/app/auth/OpsAuthView').then(m => ({ default: m.OpsAuthView })))
 
 const pageVariants: Variants = {
   initial: { opacity: 0, y: 10 },
@@ -57,9 +58,13 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
 
 
 function ProtectedFanRoute() {
-  const { userId, role } = useAuthService();
+  const { isInitialized, userId, role } = useAuthService();
   const { ticket, hasBootstrapped } = useAppStore();
   const location = useLocation();
+
+  if (!isInitialized) {
+    return <div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-pulse w-8 h-8 rounded-full bg-white/20" /></div>;
+  }
 
   if (!userId || role !== 'fan') {
     return <Navigate to="/auth" replace />;
@@ -80,9 +85,14 @@ function ProtectedFanRoute() {
 
 
 function ProtectedOpsRoute() {
-  const { userId, role } = useAuthService();
+  const { isInitialized, userId, role } = useAuthService();
+  
+  if (!isInitialized) {
+    return <div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-pulse w-8 h-8 rounded-full bg-white/20" /></div>;
+  }
+  
   if (!userId || role !== 'ops_manager') {
-    return <Navigate to="/auth" state={{ from: { pathname: '/ops' } }} replace />;
+    return <Navigate to="/opsauth" state={{ from: { pathname: '/ops' } }} replace />;
   }
   return <Outlet />;
 }
@@ -107,6 +117,7 @@ function AnimatedRoutes() {
         {/* Public Access Routes */}
         <Route path="/onboarding" element={<OnboardingView />} />
         <Route path="/auth" element={<AuthView />} />
+        <Route path="/opsauth" element={<OpsAuthView />} />
         <Route element={<ProtectedFanRoute />}><Route path="/ticket-setup" element={<PageWrapper><TicketSetupView /></PageWrapper>} /></Route>
 
         {/* Protected Fan Surface */}
@@ -139,7 +150,9 @@ function AnimatedRoutes() {
         </Route>
 
         {/* Ops Surface */}
-        <Route path="/ops" element={<PageWrapper><OpsDashboard /></PageWrapper>} />
+        <Route element={<ProtectedOpsRoute />}>
+          <Route path="/ops" element={<PageWrapper><OpsDashboard /></PageWrapper>} />
+        </Route>
         
         {/* Catch-all to redirect invalid routes (like the old /setup) to the dashboard */}
         <Route path="*" element={<Navigate to="/" replace />} />

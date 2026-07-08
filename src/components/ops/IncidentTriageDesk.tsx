@@ -53,8 +53,8 @@ export function IncidentTriageDesk() {
   }
 
   return (
-    <section>
-      <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4 px-2">Incident Triage Feed</h2>
+    <section aria-label="Incident Triage Feed">
+      <h2 className="text-[11px] font-bold text-white/60 uppercase tracking-widest mb-4 px-2">Incident Triage Feed</h2>
       
       <AnimatePresence mode="popLayout">
         {activeIncidents.length === 0 ? (
@@ -65,10 +65,10 @@ export function IncidentTriageDesk() {
             className="text-center py-16 px-6 glass-card border border-white/5 rounded-3xl bg-white/[0.02] flex flex-col items-center justify-center"
           >
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-              <CheckCircle className="w-8 h-8 text-white/20" />
+              <CheckCircle className="w-8 h-8 text-white/70" />
             </div>
-            <p className="text-[13px] font-bold text-white/60 uppercase tracking-widest">Triage Queue Clear</p>
-            <p className="text-[13px] font-medium text-white/30 mt-2">No active incidents require attention.</p>
+            <p className="text-[13px] font-bold text-white/70 uppercase tracking-widest">Triage Queue Clear</p>
+            <p className="text-[13px] font-medium text-white/60 mt-2">No active incidents require attention.</p>
           </motion.div>
         ) : (
           <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
@@ -86,11 +86,20 @@ export function IncidentTriageDesk() {
                   transition={{ delay: Math.min(idx * 0.1, 0.5) }}
                 >
                   <Card 
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={isExpanded}
                     className={cn(
-                      "glass-card border bg-white/[0.03] rounded-3xl transition-colors overflow-hidden group cursor-pointer",
+                      "glass-card border bg-white/[0.03] rounded-3xl transition-colors overflow-hidden group cursor-pointer text-left w-full",
                       isCritical ? 'border-white/20 hover:bg-white/[0.05]' : 'border-white/5 hover:bg-white/[0.04]'
                     )}
                     onClick={() => setExpandedId(isExpanded ? null : incident.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setExpandedId(isExpanded ? null : incident.id);
+                      }
+                    }}
                   >
                     <div className="p-6">
                       
@@ -105,24 +114,24 @@ export function IncidentTriageDesk() {
                           <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border",
                             incident.status === 'in_progress' ? 'bg-white/10 text-white border-white/20' : 
                             incident.status === 'assigned' ? 'bg-white/10 text-white/80 border-white/20' :
-                            'bg-white/5 text-white/40 border-transparent'
+                            'bg-white/5 text-white/60 border-transparent'
                           )}>
                             {incident.status.replace('_', ' ')}
                           </span>
                         </div>
-                        <span className="text-[11px] font-bold text-white/30 uppercase tracking-widest">
+                        <span className="text-[11px] font-bold text-white/60 uppercase tracking-widest">
                           {formatTime(incident.created_at)}
                         </span>
                       </div>
                       
                       {/* Headline Block */}
                       <div className="mb-2">
-                        <p className="text-[10px] text-white/50 uppercase tracking-widest font-bold mb-1.5">{(incident.incident_type || 'General').replace('_', ' ')}</p>
+                        <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold mb-1.5">{(incident.incident_type || 'General').replace('_', ' ')}</p>
                         <h3 className="font-bold text-[17px] tracking-tight text-white/90 leading-snug">
                           {incident.title || resolveDescription(incident.description) || 'Incident Reported'}
                         </h3>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-white/50 mt-3">
+                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-white/60 mt-3">
                         <MapPin className="w-3.5 h-3.5" />
                         <span>{resolveLocation(incident.description)}</span>
                       </div>
@@ -137,8 +146,8 @@ export function IncidentTriageDesk() {
                           {/* AI Analysis */}
                           <div>
                             <div className="flex items-center gap-1.5 mb-3">
-                              <Sparkles className="w-3.5 h-3.5 text-white/40" />
-                              <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/40">AI Analysis</h4>
+                              <Sparkles className="w-3.5 h-3.5 text-white/60" />
+                              <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/60">AI Analysis</h4>
                             </div>
                             <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5">
                               <p className="text-[13px] text-white/70 leading-relaxed font-medium">
@@ -150,7 +159,7 @@ export function IncidentTriageDesk() {
                           {/* Action Groups */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                              <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/40 mb-3">Assign Team</h4>
+                              <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/60 mb-3">Assign Team</h4>
                               <div className="flex flex-wrap gap-2">
                                 <button 
                                   onClick={() => handleAssign(incident.id, 'security')}
@@ -172,7 +181,7 @@ export function IncidentTriageDesk() {
                             </div>
                             
                             <div>
-                              <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/40 mb-3">Update Status</h4>
+                              <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/60 mb-3">Update Status</h4>
                               <div className="flex flex-wrap gap-2">
                                 <button 
                                   onClick={() => handleStatusChange(incident.id, incident.status, 'in_progress')}
@@ -196,17 +205,20 @@ export function IncidentTriageDesk() {
 
                           {/* Quick Note */}
                           <div>
-                            <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/40 mb-3">Ops Log Note</h4>
+                            <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/60 mb-3">Ops Log Note</h4>
                             <div className="flex gap-2">
+                              <label htmlFor={`note-${incident.id}`} className="sr-only">Incident Note</label>
                               <input 
+                                id={`note-${incident.id}`}
                                 type="text" 
                                 value={noteText}
                                 onChange={e => setNoteText(e.target.value)}
                                 placeholder="Record an update or action taken..." 
-                                className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-[13px] w-full focus:outline-none focus:border-white/30 text-white placeholder-white/30 font-medium"
+                                className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-[13px] w-full focus:outline-none focus:border-white/30 text-white placeholder-white/40 font-medium"
                                 onKeyDown={e => { if (e.key === 'Enter') handleAddNote(incident.id) }}
                               />
                               <button 
+                                aria-label="Send note"
                                 onClick={() => handleAddNote(incident.id)}
                                 disabled={!noteText.trim()}
                                 className="w-12 shrink-0 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors border border-white/10 disabled:opacity-50"

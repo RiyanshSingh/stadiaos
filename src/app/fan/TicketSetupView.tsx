@@ -8,6 +8,8 @@ import { useAppStore } from '@/store/useAppStore'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { GLOBAL_FOOTBALL_STADIUMS, DEFAULT_STADIUM_TEMPLATE, SECTION_GATE_MAP } from '@/lib/constants/stadiumData'
+import { validateTicketData } from '@/lib/ticketValidation'
+import { requireFanSession } from '@/lib/authGuards'
 
 export function TicketSetupView() {
   const navigate = useNavigate()
@@ -37,6 +39,10 @@ export function TicketSetupView() {
     setSubmitError(null)
 
     try {
+      // 0. Validation and Security checks
+      const sessionUserId = await requireFanSession();
+      validateTicketData(selectedStadiumName, selectedSection, row, seat);
+
       // 1. Ensure Stadium Exists
       let { data: stads } = await supabase.from('stadiums').select('id').eq('name', selectedStadiumName)
       let stadId = stads?.[0]?.id
@@ -69,7 +75,7 @@ export function TicketSetupView() {
 
       // 3. Create Ticket
       const { error } = await supabase.from('tickets').insert([{
-        user_id: userId,
+        user_id: sessionUserId,
         match_id: matchId,
         seat_section: selectedSection,
         seat_row: row,
@@ -80,7 +86,7 @@ export function TicketSetupView() {
       if (error) throw error
       
       // Load the freshly inserted ticket into global state before navigating
-      await loadBootstrap(userId)
+      await loadBootstrap(sessionUserId)
       
       // Inject the selected gate into the local state so the user sees it in this session
       useAppStore.setState(state => ({
@@ -141,7 +147,7 @@ export function TicketSetupView() {
           <div className="absolute top-1/2 left-8 right-8 h-[1px] bg-white/10 -translate-y-1/2 -z-10" />
           {[1, 2].map(num => (
             <div key={num} className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold border transition-colors bg-[#0a0a0a]", 
-              step >= num ? "text-white border-white" : "text-white/40 border-white/10"
+              step >= num ? "text-white border-white" : "text-white/70 border-white/10"
             )}>
               {num}
             </div>
@@ -151,7 +157,7 @@ export function TicketSetupView() {
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4">Select Stadium</h2>
+              <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-4">Select Stadium</h2>
               <div className="grid gap-3">
                 {GLOBAL_FOOTBALL_STADIUMS.map(stadName => (
                   <button 
@@ -165,7 +171,7 @@ export function TicketSetupView() {
                     <div>
                       <p className="font-bold text-[15px] tracking-tight">{stadName}</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-white/60 transition-colors" />
+                    <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white/60 transition-colors" />
                   </button>
                 ))}
               </div>
@@ -174,19 +180,19 @@ export function TicketSetupView() {
 
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <button onClick={() => setStep(1)} aria-label="Go back to stadium selection" className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4 hover:text-white transition-colors flex items-center gap-1">
+              <button onClick={() => setStep(1)} aria-label="Go back to stadium selection" className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-4 hover:text-white transition-colors flex items-center gap-1">
                 ← Back to Stadiums
               </button>
               
               <Card className="glass-card p-4 rounded-2xl border border-white/10 bg-white/5 mb-6 flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-white/50" />
                 <div>
-                  <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">Active Stadium</p>
+                  <p className="text-[10px] text-white/70 uppercase font-bold tracking-widest">Active Stadium</p>
                   <p className="font-bold text-[14px]">{selectedStadiumName}</p>
                 </div>
               </Card>
 
-              <h2 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-4">Enter Seat Details</h2>
+              <h2 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-4">Enter Seat Details</h2>
               <form onSubmit={handleSave} className="space-y-4">
 
                 {submitError && (
@@ -197,7 +203,7 @@ export function TicketSetupView() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label htmlFor="seat-section" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Section</label>
+                    <label htmlFor="seat-section" className="text-[11px] font-bold text-white/70 uppercase tracking-widest px-1">Section</label>
                     <div className="relative">
                       <select 
                         id="seat-section"
@@ -209,11 +215,11 @@ export function TicketSetupView() {
                         <option value="" disabled>Select Sec</option>
                         {allSections.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
-                      <ChevronRight className="w-4 h-4 text-white/30 absolute right-4 top-4 pointer-events-none rotate-90" />
+                      <ChevronRight className="w-4 h-4 text-white/60 absolute right-4 top-4 pointer-events-none rotate-90" />
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Entry Gate</label>
+                    <label className="text-[11px] font-bold text-white/70 uppercase tracking-widest px-1">Entry Gate</label>
                     <div className="relative">
                       <input 
                         readOnly
@@ -227,7 +233,7 @@ export function TicketSetupView() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label htmlFor="seat-row" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Row</label>
+                    <label htmlFor="seat-row" className="text-[11px] font-bold text-white/70 uppercase tracking-widest px-1">Row</label>
                     <div className="relative">
                       <select 
                         id="seat-row"
@@ -240,11 +246,11 @@ export function TicketSetupView() {
                         <option value="" disabled>Select Row</option>
                         {availableRows.map(r => <option key={r} value={r}>{r}</option>)}
                       </select>
-                      <ChevronRight className="w-4 h-4 text-white/30 absolute right-4 top-4 pointer-events-none rotate-90" />
+                      <ChevronRight className="w-4 h-4 text-white/60 absolute right-4 top-4 pointer-events-none rotate-90" />
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="seat-number" className="text-[11px] font-bold text-white/40 uppercase tracking-widest px-1">Seat</label>
+                    <label htmlFor="seat-number" className="text-[11px] font-bold text-white/70 uppercase tracking-widest px-1">Seat</label>
                     <div className="relative">
                       <select 
                         id="seat-number"
@@ -257,7 +263,7 @@ export function TicketSetupView() {
                         <option value="" disabled>Select Seat</option>
                         {availableSeats.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
-                      <ChevronRight className="w-4 h-4 text-white/30 absolute right-4 top-4 pointer-events-none rotate-90" />
+                      <ChevronRight className="w-4 h-4 text-white/60 absolute right-4 top-4 pointer-events-none rotate-90" />
                     </div>
                   </div>
                 </div>

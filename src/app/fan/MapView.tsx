@@ -418,12 +418,12 @@ export function MapView() {
                 <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl p-3 flex flex-col gap-2 relative">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-blue-400 ml-1" />
-                    <Input value={routeFrom} onChange={(e) => setRouteFrom(e.target.value)} className="h-8 bg-transparent border-0 px-0 focus-visible:ring-0 text-white placeholder:text-white/30" placeholder="From (Current Location)" />
+                    <Input value={routeFrom} onChange={(e) => setRouteFrom(e.target.value)} className="h-8 bg-transparent border-0 px-0 focus-visible:ring-0 text-white placeholder:text-white/60" placeholder="From (Current Location)" />
                   </div>
                   <div className="absolute left-[8px] top-[26px] bottom-[26px] w-[1px] bg-white/10" />
                   <div className="flex items-center gap-3 border-t border-white/5 pt-2">
                     <div className="w-2 h-2 rounded-sm bg-red-400 ml-1" />
-                    <Input value={routeTo} onChange={(e) => setRouteTo(e.target.value)} className="h-8 bg-transparent border-0 px-0 focus-visible:ring-0 text-white placeholder:text-white/30" placeholder="Where to?" autoFocus />
+                    <Input value={routeTo} onChange={(e) => setRouteTo(e.target.value)} className="h-8 bg-transparent border-0 px-0 focus-visible:ring-0 text-white placeholder:text-white/60" placeholder="Where to?" autoFocus />
                   </div>
                 </div>
                 <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
@@ -507,7 +507,7 @@ export function MapView() {
 
               <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 mb-5">
                 <div className="flex items-center gap-3">
-                  <Accessibility className={cn("w-5 h-5", routeAccessible ? "text-blue-400" : "text-white/40")} />
+                  <Accessibility className={cn("w-5 h-5", routeAccessible ? "text-blue-400" : "text-white/70")} />
                   <div>
                     <p className="text-sm font-medium">Accessible Route</p>
                     <p className="text-[10px] text-white/50">Avoids stairs and escalators</p>

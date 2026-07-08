@@ -83,11 +83,9 @@ export function FanCopilot() {
 
     try {
       await reportIncident(
-                { type: data.incidentType, zone: data.locationLabel || (ticketValid ? `Sec ${ticket.seat_section}, Row ${ticket.seat_row}` : 'Unknown'), description: `${ticketValid ? 'Reported from Sec ' + ticket.seat_section + ', Row ' + ticket.seat_row + ' | ' : ''}${data.description}` },
+        { type: data.incidentType, zone: data.locationLabel || (ticketValid ? `Sec ${ticket.seat_section}, Row ${ticket.seat_row}` : 'Unknown'), description: `${ticketValid ? 'Reported from Sec ' + ticket.seat_section + ', Row ' + ticket.seat_row + ' | ' : ''}${data.description}` },
         match.id,
-        match.stadium_id,
-        profile.id,
-        profile.role
+        match.stadium_id
       );
     } catch (e) {
       console.error(e);
@@ -103,17 +101,17 @@ export function FanCopilot() {
               <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/5"><Navigation2 className="w-4 h-4 text-white" /></div>
               <div>
                 <p className="text-[15px] font-bold tracking-tight text-white/90">{msg.data.destinationLabel || msg.data.destination}</p>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mt-0.5">Route Ready</p>
+                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mt-0.5">Route Ready</p>
               </div>
             </div>
             <div className="flex gap-6 mb-5 p-4 bg-white/5 rounded-2xl border border-white/5">
               <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Est. Time</p>
+                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Est. Time</p>
                 <p className="text-[15px] font-bold text-white/90">{msg.data.eta}</p>
               </div>
               <div className="w-px bg-white/10" />
               <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Distance</p>
+                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Distance</p>
                 <p className="text-[15px] font-bold text-white/90">{msg.data.distance}</p>
               </div>
             </div>
@@ -131,16 +129,16 @@ export function FanCopilot() {
               <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/5"><Coffee className="w-4 h-4 text-white" /></div>
               <div>
                 <p className="text-[15px] font-bold tracking-tight text-white/90">{msg.data.name}</p>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mt-0.5">Facility Located</p>
+                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mt-0.5">Facility Located</p>
               </div>
             </div>
             <div className="flex justify-between items-center mb-5 p-4 bg-white/5 rounded-2xl border border-white/5">
               <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Wait Time</p>
+                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Wait Time</p>
                 <p className="text-[15px] font-bold text-white/90">{msg.data.wait}</p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Crowd</p>
+                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Crowd</p>
                 <p className="text-[15px] font-bold text-white/90">{msg.data.crowd}</p>
               </div>
             </div>
@@ -219,7 +217,7 @@ export function FanCopilot() {
                 <span className="w-1.5 h-1.5 rounded-full bg-white/90 animate-pulse" /> Match: {activeMatchStatus}
               </div>
               <div className="flex items-center h-8 gap-2 px-3 rounded-full bg-white/5 text-[10px] font-bold tracking-widest uppercase text-white/70 shadow-lg backdrop-blur-md border border-white/5">
-                <MapPin className="w-3 h-3 text-white/40" /> {currentZoneId}
+                <MapPin className="w-3 h-3 text-white/70" /> {currentZoneId}
               </div>
               <div className="flex items-center h-8 gap-2 px-3 rounded-full bg-white/5 text-[10px] font-bold tracking-widest uppercase text-white/70 shadow-lg backdrop-blur-md border border-white/5">
                 Sec {currentSection}
@@ -261,7 +259,7 @@ export function FanCopilot() {
 
               {msg.id === 'welcome-1' && !hasStarted && (
                 <div className="mt-4 w-full">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-white/30 ml-1 mb-2">Try asking</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-white/60 ml-1 mb-2">Try asking</p>
                   <div className="flex flex-col gap-2">
                     {starterPrompts.map((prompt, i) => (
                       <button 
@@ -307,7 +305,7 @@ export function FanCopilot() {
       {/* COMPOSER */}
       <div className="fixed bottom-0 left-0 right-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black via-black/95 to-transparent z-40">
         <div className="flex items-end gap-3 p-2 bg-white/[0.03] border border-white/10 rounded-[2rem] backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
-          <button aria-label="Attach file" className="w-10 h-10 flex items-center justify-center text-white/40 hover:text-white/80 transition-colors shrink-0">
+          <button aria-label="Attach file" className="w-10 h-10 flex items-center justify-center text-white/70 hover:text-white/80 transition-colors shrink-0">
             <Paperclip className="w-5 h-5" aria-hidden="true" />
           </button>
           <textarea 
@@ -317,7 +315,7 @@ export function FanCopilot() {
             aria-label="Message Copilot"
             aria-disabled={isSending}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(input); } }}
-            className="flex-1 bg-transparent text-[15px] font-medium text-white placeholder:text-white/30 focus:outline-none resize-none py-3.5 min-h-[48px] max-h-[120px]"
+            className="flex-1 bg-transparent text-[15px] font-medium text-white placeholder:text-white/60 focus:outline-none resize-none py-3.5 min-h-[48px] max-h-[120px]"
             rows={1}
             disabled={isSending}
           />
@@ -331,7 +329,7 @@ export function FanCopilot() {
               <Send className="w-4 h-4" aria-hidden="true" />
             </button>
           ) : (
-            <button aria-label="Voice input" className="w-10 h-10 shrink-0 flex items-center justify-center text-white/40 hover:text-white/80 transition-colors">
+            <button aria-label="Voice input" className="w-10 h-10 shrink-0 flex items-center justify-center text-white/70 hover:text-white/80 transition-colors">
               <Mic className="w-5 h-5" aria-hidden="true" />
             </button>
           )}

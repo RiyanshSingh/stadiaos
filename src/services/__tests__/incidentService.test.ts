@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useIncidentService } from '../incidentService';
 import { supabase } from '../supabase';
+import { triageService } from '../triageService';
+import { useAuthService } from '../authService';
+
+vi.mock('@/lib/authGuards', () => ({
+  requireOpsSession: vi.fn().mockResolvedValue('ops-123'),
+  requireFanSession: vi.fn().mockResolvedValue('fan-123'),
+}));
 
 vi.mock('../supabase', () => ({
   supabase: {

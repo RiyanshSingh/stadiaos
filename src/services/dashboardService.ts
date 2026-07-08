@@ -1,4 +1,5 @@
 import { supabase } from '@/services/supabase';
+import { groq } from '@/services/groq';
 import type { AiRecommendation } from '@/lib/types/domain';
 
 export interface GateStatus {
@@ -47,7 +48,6 @@ export const dashboardService = {
     }
     
     try {
-      const { groq } = await import('@/services/groq');
       const completion = await groq.chat.completions.create({
         messages: [
           { role: 'system', content: 'You are an AI assistant for StadiaOS. The crowd metrics DB is currently sparse. Generate exactly 2 creative, short, helpful recommendations for fans in a JSON array. Each object should have: recommendation_type (e.g. crowd, food), title (e.g. Snack Time), content (1-2 sentences of advice).' }

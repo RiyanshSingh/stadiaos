@@ -142,7 +142,7 @@ export function RouteDetailView() {
                   </div>
                 </div>
                 <div className="p-3 bg-black/40 rounded-xl border border-white/5 flex items-center gap-2">
-                  <Accessibility className={cn("w-4 h-4", route.routeMode === 'accessible' ? 'text-blue-400' : 'text-white/40')} />
+                  <Accessibility className={cn("w-4 h-4", route.routeMode === 'accessible' ? 'text-blue-400' : 'text-white/70')} />
                   <div>
                     <p className="text-[9px] uppercase tracking-wider text-white/50 mb-0.5">Mode</p>
                     <p className="text-xs font-bold capitalize">{route.routeMode}</p>

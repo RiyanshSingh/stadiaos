@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Navigation, Bell, Map, ChevronRight } from 'lucide-react';
 
 const slides = [
@@ -24,28 +24,29 @@ const slides = [
 export function OnboardingView() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleNext = () => {
     if (currentSlide === slides.length - 1) {
-      localStorage.setItem('has_seen_onboarding', 'true');
-      navigate('/auth', { replace: true });
+      sessionStorage.setItem('has_seen_onboarding', 'true');
+      navigate('/auth', { state: location.state });
     } else {
       setCurrentSlide(s => s + 1);
     }
   };
 
   const handleSkip = () => {
-    localStorage.setItem('has_seen_onboarding', 'true');
-    navigate('/auth', { replace: true });
+    sessionStorage.setItem('has_seen_onboarding', 'true');
+    navigate('/auth', { state: location.state });
   };
 
   return (
-    <div className="h-full w-full bg-black text-white relative flex flex-col overflow-hidden font-sans">
+    <div className="min-h-[100dvh] w-full bg-black text-white relative flex flex-col overflow-hidden font-sans">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-white/[0.03] rounded-full blur-[80px]" />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-8 relative z-10">
+      <div className="flex-1 flex flex-col items-center justify-center px-8 relative z-10 pt-12 pb-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -86,7 +87,7 @@ export function OnboardingView() {
         <div className="flex items-center gap-4">
           <button 
             onClick={handleSkip}
-            className="flex-1 py-4 text-[13px] font-bold uppercase tracking-widest text-white/40 hover:text-white/80 transition-colors"
+            className="flex-1 py-4 text-[13px] font-bold uppercase tracking-widest text-white/70 hover:text-white/80 transition-colors"
           >
             Skip
           </button>

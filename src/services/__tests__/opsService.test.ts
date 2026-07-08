@@ -4,6 +4,11 @@ import { supabase } from '../supabase';
 import { dashboardService } from '../dashboardService';
 import { queueService } from '../queueService';
 
+vi.mock('@/lib/authGuards', () => ({
+  requireOpsSession: vi.fn().mockResolvedValue('ops-123'),
+  requireFanSession: vi.fn().mockResolvedValue('fan-123'),
+}));
+
 vi.mock('../supabase', () => ({
   supabase: {
     from: vi.fn(),

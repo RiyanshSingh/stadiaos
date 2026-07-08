@@ -61,7 +61,7 @@ export function MyReportsView() {
               <ShieldAlert className="w-8 h-8 text-white/20" />
             </div>
             <p className="text-[13px] font-bold text-white/50 uppercase tracking-widest">No active reports</p>
-            <p className="text-[13px] text-white/30 font-medium mt-2 max-w-[200px]">You haven't submitted any incidents for this match.</p>
+            <p className="text-[13px] text-white/60 font-medium mt-2 max-w-[200px]">You haven't submitted any incidents for this match.</p>
           </div>
         ) : (
           myIncidents.map((report) => (
@@ -91,7 +91,7 @@ export function MyReportsView() {
                   )}>
                     {report.status.replace('_', ' ')}
                   </span>
-                  <ChevronDown className={cn("w-4 h-4 text-white/30 transition-transform", expandedId === report.id ? "rotate-180" : "")} />
+                  <ChevronDown className={cn("w-4 h-4 text-white/60 transition-transform", expandedId === report.id ? "rotate-180" : "")} />
                 </div>
               </div>
 
@@ -114,15 +114,15 @@ export function MyReportsView() {
                             <div key={i} className="relative">
                               <div className="absolute -left-[21px] top-1.5 w-2 h-2 rounded-full bg-white border border-black shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
                               <div className="flex items-center gap-1.5 mb-1">
-                                <Clock className="w-3 h-3 text-white/40" />
-                                <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">{formatTime(update.created_at)}</p>
+                                <Clock className="w-3 h-3 text-white/70" />
+                                <p className="text-[10px] text-white/70 uppercase font-bold tracking-widest">{formatTime(update.created_at)}</p>
                               </div>
                               <p className="text-[13px] font-medium text-white/80 leading-relaxed">{update.note}</p>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-white/30">No updates yet. Support team is reviewing.</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-white/60">No updates yet. Support team is reviewing.</p>
                       )}
                     </div>
                   </motion.div>

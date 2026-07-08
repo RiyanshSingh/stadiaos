@@ -2,6 +2,7 @@ import { supabase } from '@/services/supabase';
 import { dashboardService } from './dashboardService';
 import { queueService } from './queueService';
 import { facilityService } from './facilityService';
+import { requireOpsSession } from '@/lib/authGuards';
 
 export interface OpsSnapshot {
   activeIncidentsCount: number;
@@ -19,6 +20,7 @@ export interface PublicAdvisory {
 
 export const opsService = {
   fetchCommandCenterSnapshot: async (matchId: string): Promise<OpsSnapshot> => {
+    await requireOpsSession();
     // 1. Fetch active incidents count
     const { count: incidentCount } = await supabase
       .from('incidents')
@@ -52,6 +54,7 @@ export const opsService = {
   },
 
   publishPublicAdvisory: async (matchId: string, stadiumId: string, title: string, content: string): Promise<void> => {
+    const userId = await requireOpsSession();
     const { error } = await supabase
       .from('ai_recommendations')
       .insert([{
@@ -70,6 +73,7 @@ export const opsService = {
   },
 
   fetchPublicAdvisories: async (matchId: string): Promise<PublicAdvisory[]> => {
+    await requireOpsSession();
     const { data, error } = await supabase
       .from('ai_recommendations')
       .select('id, title, content, created_at')
@@ -86,6 +90,7 @@ export const opsService = {
   },
 
   fetchOperationsHotspots: async (matchId: string, stadiumId: string) => {
+    await requireOpsSession();
     const gates = await dashboardService.getDashboardGateStatus(matchId);
     const facilities = await facilityService.fetchFacilities(stadiumId, matchId);
     

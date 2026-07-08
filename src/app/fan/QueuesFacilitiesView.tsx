@@ -78,7 +78,7 @@ export function QueuesFacilitiesView() {
         {/* Smart Recommendation Banner */}
         {smartPick && !loading && (
           <div className="px-6 mb-6">
-            <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Smart Pick</h2>
+            <h2 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-2">Smart Pick</h2>
             <Card className="glass-card bg-white/[0.04] border border-white/10 p-5 rounded-3xl flex items-center justify-between gap-4">
               <div className="flex-1">
                 <p className="text-lg font-bold tracking-tight text-white">{smartPick.name}</p>
@@ -95,7 +95,7 @@ export function QueuesFacilitiesView() {
 
         {/* Filter Bar */}
         <div className="px-6 mb-8">
-          <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Categories</h2>
+          <h2 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3">Categories</h2>
           <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2 -mx-2 px-2">
             {filters.map((f) => (
               <button 
@@ -107,7 +107,7 @@ export function QueuesFacilitiesView() {
                   "flex flex-col items-center justify-center gap-2 h-20 w-20 rounded-2xl border transition-all shrink-0",
                   activeFilter === f.id
                     ? "bg-white/10 border-white/30 text-white"
-                    : "bg-black hover:bg-white/5 border-white/10 text-white/40"
+                    : "bg-black hover:bg-white/5 border-white/10 text-white/70"
                 )}
               >
                 <f.icon className="w-6 h-6" aria-hidden="true" />
@@ -140,9 +140,9 @@ export function QueuesFacilitiesView() {
         {/* Facility List */}
         <div className="px-6 space-y-4 pb-6">
           {loading ? (
-            <p className="text-white/30 text-[13px] font-medium text-center py-10 uppercase tracking-widest">Loading facilities...</p>
+            <p className="text-white/60 text-[13px] font-medium text-center py-10 uppercase tracking-widest">Loading facilities...</p>
           ) : filteredFacilities.length === 0 ? (
-            <p className="text-white/30 text-[13px] font-medium text-center py-10 uppercase tracking-widest">No facilities found.</p>
+            <p className="text-white/60 text-[13px] font-medium text-center py-10 uppercase tracking-widest">No facilities found.</p>
           ) : (
             filteredFacilities.map((fac) => (
               <Link key={fac.id} to={`/facility/${fac.id}`} className="block group">
@@ -163,15 +163,15 @@ export function QueuesFacilitiesView() {
                   
                   <div className="flex items-center gap-2 mb-5">
                     <div className="flex-1 bg-white/5 rounded-2xl p-3 border border-white/5 flex flex-col justify-center items-center">
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Wait</p>
+                      <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Wait</p>
                       <p className="text-[15px] font-bold text-white tracking-tight">{fac.wait}</p>
                     </div>
                     <div className="flex-1 bg-white/5 rounded-2xl p-3 border border-white/5 flex flex-col justify-center items-center">
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Crowd</p>
+                      <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Crowd</p>
                       <p className="text-[15px] font-bold text-white tracking-tight">{fac.crowd}</p>
                     </div>
                     <div className="flex-1 bg-white/5 rounded-2xl p-3 border border-white/5 flex flex-col justify-center items-center">
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Dist</p>
+                      <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Dist</p>
                       <p className="text-[15px] font-bold text-white tracking-tight">{fac.distance}</p>
                     </div>
                   </div>

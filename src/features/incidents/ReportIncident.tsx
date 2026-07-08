@@ -47,7 +47,7 @@ export function ReportIncident() {
       setValidationError('Please provide a location for the incident.')
       return
     }
-    if (isSubmitting || !matchId || !stadiumId || !userId || !role) return
+    if (isSubmitting || !matchId || !stadiumId) return
     setIsSubmitting(true)
 
     try {
@@ -55,7 +55,7 @@ export function ReportIncident() {
         type,
         zone,
         description
-      }, matchId, stadiumId, userId, role)
+      }, matchId, stadiumId)
       setSubmitSuccess(true)
     } finally {
       setIsSubmitting(false)
@@ -128,7 +128,15 @@ export function ReportIncident() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   key={t.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setType(t.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setType(t.id);
+                    }
+                  }}
                   className={cn(
                     "relative p-3.5 rounded-2xl border cursor-pointer text-center transition-all duration-300 overflow-hidden font-medium text-sm tracking-tight",
                     type === t.id 
@@ -162,12 +170,12 @@ export function ReportIncident() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="space-y-3">
-            <label htmlFor="incident-description" className="text-sm font-medium text-white/70 tracking-tight">Description <span className="text-white/40 font-normal">(min. 10 characters)</span></label>
+            <label htmlFor="incident-description" className="text-sm font-medium text-white/70 tracking-tight">Description <span className="text-white/70 font-normal">(min. 10 characters)</span></label>
             <textarea 
               id="incident-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full glass-input rounded-2xl p-5 text-base min-h-[120px] resize-none text-white placeholder:text-white/30"
+              className="w-full glass-input rounded-2xl p-5 text-base min-h-[120px] resize-none text-white placeholder:text-white/60"
               placeholder="Please describe what happened in detail..."
               minLength={10}
               required

@@ -48,7 +48,7 @@ export function MatchCenterView() {
           <Card className="glass-card p-6 border-0 bg-white/[0.04] rounded-[2rem] relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-3xl" />
             
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Live Status</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-2">Live Status</p>
             <h2 className="text-3xl font-bold tracking-tight mb-2 text-white/90">{match?.title || 'Second Half'}</h2>
             
             <div className="flex items-center gap-2 mb-8">
@@ -58,13 +58,13 @@ export function MatchCenterView() {
             
             <div className="flex gap-3">
               <div className="flex-1 p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center justify-center">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">End ETA</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-1">End ETA</p>
                 <p className="text-[17px] font-bold text-white tracking-tight flex items-center gap-2">
                   <Clock className="w-4 h-4 text-white/50" /> 9:45 PM
                 </p>
               </div>
               <div className="flex-1 p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center justify-center">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Crowd</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-1">Crowd</p>
                 <p className="text-[17px] font-bold text-white tracking-tight flex items-center gap-2">
                   <Users className="w-4 h-4 text-white/50" /> Peak
                 </p>
@@ -75,10 +75,10 @@ export function MatchCenterView() {
 
         {/* Live Advisories */}
         <section>
-          <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Live Advisories</h3>
+          <h3 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Live Advisories</h3>
           <div className="space-y-3">
             {!loading && alerts.length === 0 && (
-              <p className="text-white/30 text-[13px] font-medium py-4 px-1 uppercase tracking-widest">No active advisories.</p>
+              <p className="text-white/60 text-[13px] font-medium py-4 px-1 uppercase tracking-widest">No active advisories.</p>
             )}
             
             {!loading && alerts.map(alert => {
@@ -107,7 +107,7 @@ export function MatchCenterView() {
 
         {/* Matchday Timeline */}
         <section>
-          <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Event Timeline</h3>
+          <h3 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Event Timeline</h3>
           <Card className="glass-card p-6 rounded-3xl border border-white/5 bg-white/[0.03] space-y-8">
             
             <div className="flex gap-5 relative">
@@ -116,7 +116,7 @@ export function MatchCenterView() {
                 <div className="absolute top-3.5 bottom-[-2rem] left-[6px] w-[2px] bg-white/10" />
               </div>
               <div className="-mt-1">
-                <p className="text-[10px] text-white/40 font-bold tracking-widest uppercase mb-1">6:00 PM</p>
+                <p className="text-[10px] text-white/70 font-bold tracking-widest uppercase mb-1">6:00 PM</p>
                 <p className="text-[15px] font-bold text-white/70 tracking-tight">Gates Open</p>
               </div>
             </div>
@@ -137,7 +137,7 @@ export function MatchCenterView() {
                 <div className="w-3.5 h-3.5 rounded-full bg-white/20 border-2 border-white/50 z-10" />
               </div>
               <div className="-mt-1 w-full">
-                <p className="text-[10px] text-white/40 font-bold tracking-widest uppercase mb-1">9:45 PM</p>
+                <p className="text-[10px] text-white/70 font-bold tracking-widest uppercase mb-1">9:45 PM</p>
                 <p className="text-[15px] font-bold text-white/70 tracking-tight mb-3">Match Ends & Exit Phase</p>
                 <Link to="/map?dest=gate_c" className="w-full h-12 bg-white/5 hover:bg-white/10 transition-colors border border-white/10 rounded-2xl flex items-center justify-center gap-2 text-[13px] font-bold text-white/90 uppercase tracking-widest">
                   <Navigation className="w-4 h-4" /> View Exit Plan

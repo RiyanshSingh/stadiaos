@@ -1,9 +1,12 @@
 import { supabase } from '@/services/supabase';
 import type { Profile, Match, Ticket } from '@/lib/types/domain';
+import { requireAuthenticatedUser } from '@/lib/authGuards';
 
 export const bootstrapService = {
   async loadAppBootstrapData(userId: string) {
     try {
+      requireAuthenticatedUser();
+
       // 1. Fetch Profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -12,10 +15,10 @@ export const bootstrapService = {
         .maybeSingle();
         
       if (profileError) throw profileError;
+      if (!profileData) throw new Error('Profile not found. Re-authentication required.');
 
-      // It's possible the profile is null if they just signed up and the trigger failed,
-      // but authService should handle fallback creation. Let's proceed if it exists.
-      if (profileData && profileData.role === 'fan') {
+      // Strict role enforcement during bootstrap
+      if (profileData.role === 'fan') {
         // Fetch their most recent ticket
         const { data: ticketData } = await supabase
           .from('tickets')
@@ -25,32 +28,40 @@ export const bootstrapService = {
           .limit(1)
           .maybeSingle();
         
+        // Return clear markers for routing layer
+        if (!ticketData) {
+          return {
+            profile: profileData as Profile,
+            match: null,
+            ticket: null
+          };
+        }
+
         let matchData = null;
-        if (ticketData) {
-           const { data: mData } = await supabase.from('matches').select('*').eq('id', ticketData.match_id).single();
-           if (mData) {
-             const { data: sData } = await supabase.from('stadiums').select('name').eq('id', mData.stadium_id).single();
-             matchData = { ...mData, title: mData.title || (sData ? sData.name + ' Match' : 'Match') };
-             matchData.stadium_name = sData?.name;
-           }
+        const { data: mData } = await supabase.from('matches').select('*').eq('id', ticketData.match_id).single();
+        if (mData) {
+          const { data: sData } = await supabase.from('stadiums').select('name').eq('id', mData.stadium_id).single();
+          matchData = { ...mData, title: mData.title || (sData ? sData.name + ' Match' : 'Match') };
+          matchData.stadium_name = sData?.name;
         }
 
         return {
           profile: profileData as Profile,
           match: matchData,
-          ticket: ticketData as Ticket | null
+          ticket: ticketData as Ticket
         };
-      } else {
+      } else if (profileData.role === 'ops_manager') {
         return {
           profile: profileData as Profile,
           match: null,
           ticket: null
         };
+      } else {
+         throw new Error(`Unsupported role: ${profileData.role}`);
       }
-
     } catch (error) {
       console.error('App bootstrap failed:', error);
-      return null;
+      throw error; // Throw so caller handles it (e.g. redirecting) instead of silent failure
     }
   }
 };

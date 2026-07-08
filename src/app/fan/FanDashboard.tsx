@@ -135,7 +135,7 @@ export function FanDashboard() {
               Match is <span className="text-white">{match?.status === 'live' ? 'Live.' : 'Upcoming.'}</span><br />
               <span className="text-white/50">Enjoy the game.</span>
             </h2>
-            <div className="flex items-center gap-2.5 text-[13px] text-white/40 font-medium tracking-tight">
+            <div className="flex items-center gap-2.5 text-[13px] text-white/70 font-medium tracking-tight">
               <span className="text-white/80">{match?.title || 'Unknown Match'}</span>
               <span className="w-1 h-1 rounded-full bg-white/20" />
               <span>{match?.home_team ? `${match.home_team} vs ${match.away_team}` : 'Luzhniki Stadium'}</span>
@@ -146,8 +146,8 @@ export function FanDashboard() {
         {/* C. Global Search / Ask Copilot */}
         <motion.section variants={itemVariants}>
           <Link to="/copilot" className="relative block group">
-            <Search className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-hover:text-white/80 transition-colors pointer-events-none" />
-            <div className="w-full pl-11 pr-4 h-12 bg-white/5 border border-white/10 rounded-full flex items-center text-white/40 text-[15px] font-medium tracking-tight group-hover:bg-white/10 group-hover:border-white/20 transition-all backdrop-blur-md shadow-sm relative z-0">
+            <Search className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70 group-hover:text-white/80 transition-colors pointer-events-none" />
+            <div className="w-full pl-11 pr-4 h-12 bg-white/5 border border-white/10 rounded-full flex items-center text-white/70 text-[15px] font-medium tracking-tight group-hover:bg-white/10 group-hover:border-white/20 transition-all backdrop-blur-md shadow-sm relative z-0">
               Ask Copilot
             </div>
           </Link>
@@ -155,7 +155,7 @@ export function FanDashboard() {
 
         {/* D. Live Status Cards */}
         <motion.section variants={itemVariants}>
-          <h3 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Live Status</h3>
+          <h3 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Live Status</h3>
           <div className="grid grid-cols-2 gap-3">
             {liveStatusCards.map((card) => (
               <Link key={card.id} to={card.route}>
@@ -168,7 +168,7 @@ export function FanDashboard() {
                   </div>
                   <div>
                     <p className="text-[22px] font-bold tracking-tight leading-none mb-1 text-white">{card.value}</p>
-                    <p className="text-xs text-white/40 font-medium tracking-tight">{card.subtext}</p>
+                    <p className="text-xs text-white/70 font-medium tracking-tight">{card.subtext}</p>
                   </div>
                 </Card>
               </Link>
@@ -179,7 +179,7 @@ export function FanDashboard() {
         {/* E. Quick Navigation */}
         <motion.section variants={itemVariants}>
           <div className="flex justify-between items-center mb-3 px-1">
-            <h3 className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Quick Actions</h3>
+            <h3 className="text-[11px] font-bold text-white/70 uppercase tracking-widest">Quick Actions</h3>
             <Link to="/map" className="flex items-center gap-1 text-[11px] font-bold text-white/50 hover:text-white transition-colors uppercase tracking-widest">
               Open Map <Navigation className="w-3 h-3" />
             </Link>
@@ -198,7 +198,7 @@ export function FanDashboard() {
 
         {/* F. Need Help / Emergency Actions */}
         <motion.section variants={itemVariants}>
-          <h3 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Emergency & Support</h3>
+          <h3 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">Emergency & Support</h3>
           <div className="grid grid-cols-2 gap-3">
             <Link to="/report">
               <Card className="glass-card p-3.5 border border-slate-700/30 bg-slate-800/20 hover:bg-slate-800/40 transition-all flex items-center gap-3 rounded-2xl">
@@ -229,7 +229,7 @@ export function FanDashboard() {
 
         {/* G. Smart Recommendations */}
         <motion.section variants={itemVariants}>
-          <h3 className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-3 px-1">AI Recommendations</h3>
+          <h3 className="text-[11px] font-bold text-white/70 uppercase tracking-widest mb-3 px-1">AI Recommendations</h3>
           <div className="space-y-2">
             {recommendations.length > 0 ? recommendations.map((rec) => (
               <Link key={rec.id} to={`/map`} className="block">
@@ -241,7 +241,7 @@ export function FanDashboard() {
                 </Card>
               </Link>
             )) : (
-              <p className="text-white/30 text-[13px] font-medium px-1">No active recommendations right now.</p>
+              <p className="text-white/60 text-[13px] font-medium px-1">No active recommendations right now.</p>
             )}
           </div>
         </motion.section>
@@ -249,7 +249,7 @@ export function FanDashboard() {
         {/* H. Recent Activity / Continue */}
         <motion.section variants={itemVariants}>
           <div className="flex justify-between items-center mb-3 px-1">
-            <h3 className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Recent & Saved</h3>
+            <h3 className="text-[11px] font-bold text-white/70 uppercase tracking-widest">Recent & Saved</h3>
             <Link to="/saved" className="text-[11px] font-bold text-white/50 hover:text-white transition-colors uppercase tracking-widest">See all</Link>
           </div>
           <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-4 -mx-6 px-6">
@@ -262,7 +262,7 @@ export function FanDashboard() {
                     </div>
                   </div>
                   <p className="font-semibold tracking-tight text-[13px] text-white/90">{recent.label}</p>
-                  <p className="text-[10px] font-medium tracking-tight text-white/40 mt-0.5">{recent.subtext}</p>
+                  <p className="text-[10px] font-medium tracking-tight text-white/70 mt-0.5">{recent.subtext}</p>
                 </Card>
               </Link>
             ))}

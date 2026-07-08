@@ -56,7 +56,7 @@ export function BottomNav() {
               aria-label={item.label}
               className={cn(
                 "relative flex-1 flex flex-col items-center justify-center gap-1 transition-colors h-full z-10",
-                isActive ? "text-white" : "text-white/40 hover:text-white/80"
+                isActive ? "text-white" : "text-white/70 hover:text-white/80"
               )}
             >
               {isActive && (
