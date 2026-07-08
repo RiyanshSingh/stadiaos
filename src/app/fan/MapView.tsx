@@ -244,7 +244,7 @@ export function MapView() {
           >
             <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-[1000px] !h-[1000px] flex items-center justify-center">
               <div className="relative w-full h-full">
-                <img src="/stadium-map.png" alt="Stadium Map" className="absolute inset-0 w-full h-full object-contain opacity-40 pointer-events-none" />
+                <img src="/stadium-map.png" alt="Stadium Map" loading="lazy" className="absolute inset-0 w-full h-full object-contain opacity-40 pointer-events-none" />
 
                 {/* Route Line Overlay — real polyline from routingService or fallback */}
                 {mode === 'route' && routeGenerated && computedRoute && computedRoute.polyline.length > 1 && (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { Bell, Search, MapPin, Coffee, AlertTriangle, ShieldAlert, HeartPulse, History, Navigation, Map, Ticket, UserSearch, Accessibility } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -67,7 +67,7 @@ export function FanDashboard() {
     }
   }, [match?.id])
 
-  const state = {
+  const state = React.useMemo(() => ({
     unreadNotificationsCount: 2,
     
     quickActions: [
@@ -84,7 +84,7 @@ export function FanDashboard() {
       { label: 'Open Incident', subtext: '10 mins ago', icon: History, path: '/my-reports' },
       { label: 'Saved Route', subtext: 'To Parking', icon: MapPin, path: '/saved' }
     ] as RecentItem[]
-  }
+  }), [])
 
   return (
     <div className="min-h-screen bg-black text-white pb-32 px-6 pt-12 relative overflow-hidden">
